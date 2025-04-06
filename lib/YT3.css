@@ -1,0 +1,166 @@
+@mixin font-base {
+	padding: 0;
+	margin: 0;
+	line-height: 1.3;
+	font-weight: 600;
+}
+
+h4 {
+	@include font-base;
+}
+
+p {
+	@include font-base;
+	color: grey;
+	font-size: 0.7rem;
+}
+
+body {
+	background-color: #eee;
+}
+
+.container {
+	width: 1560px;
+	background-color: #fff;
+	margin: 0 auto;
+}
+
+header,
+section {
+	position: fixed;
+	text-align: center;
+	width: 960px;
+	background-color: #fff;
+}
+
+section {
+	top: 50px;
+}
+
+.logo {
+	width: 120px;
+	padding: 10px;
+}
+
+main {
+	padding: 18px 18px 10px;
+}
+
+article {
+	display: flex;
+	align-items: center;
+	padding: 8px 12px;
+	border: 2px solid white;
+	border-radius: 8px;
+	margin: 0 auto;
+	&:hover {
+		border: 2px solid #ff9999;
+	}
+}
+
+.thumb {
+	height: 70px;
+	border-radius: 4px;
+}
+
+.details {
+	padding: 8px 22px;
+}
+
+
+body {
+	background-color: white;
+  }
+  
+  .item {
+	/*  flex: 25%;   */
+	max-width: 300px;
+	min-width: 100px;
+	height: 400px;
+	/* background: rgb(187, 218, 15); */
+	border-width: 10px;
+	border-style: solid;
+	border-color: white ;
+	padding: 0px 0px 0px 0px  !important ;
+    border-radius: 12px;
+	
+  }
+  
+  
+  main {
+	display: flex;
+	flex-wrap: wrap;
+	background: white ;
+	text-align: center  !important ;
+  }
+  
+  
+  .uk-panel {
+	border-radius: 3% 3% 0% 0% !important ;
+  }
+  
+  h4 {
+	padding: 0px 10px 0px 10px ;
+	font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif ;
+	font-size: larger;
+  }
+  
+  p {
+	padding: 0px 10px 0px 10px ;
+  }
+  
+  .YTi {
+	width: 100% ;
+	border-radius: 3% 3% 0% 0% !important ;
+  }
+  
+  h4 {
+	text-align: left ;
+	padding: 5px;
+	margin: 0px;
+  }
+  h2 {
+	margin: 0px;
+  }
+  
+  main#Grid.uk-flex {
+	text-align: center  !important ;
+	position: absolute;
+	top: 10px;
+	left: 100px;
+  }
+  
+  
+  h4 {
+    text-align: left ;
+    padding: 5px;
+    margin: 0px;
+  }
+  h2 {
+    margin: 0px;
+  }
+  
+  font {
+    letter-spacing: -7px;
+  }
+  
+  #myBtn {
+    display: none; 
+    position: fixed;
+    bottom: 20px;
+    left: 30px; 
+    z-index: 99; 
+    border: none; 
+    outline: none;
+    background-color: #369; 
+    color: white; 
+    cursor: pointer; 
+    padding: 15px; 
+    border-radius: 10px; 
+    font-size: 18px; 
+  }
+  
+  #myBtn:hover {
+    background-color: #555; /* Add a dark-grey background on hover */
+  }
+  
