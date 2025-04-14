@@ -1,25 +1,17 @@
-UL<body>
+<body>
 
   <script>
 
 const element = document.querySelector('#result');
-// const headers = { 'Authorization': 'Bearer my-token' };
-const headers = {
-  "code": "c8983220-1cca-4626-a19d-801a6aae003c",
-  "client_id": "67fd0d4c88772990d50ec059",
-  "redirect_uri": "https://oauthdebugger.com/debug",
-  "client_secret": "e6b5a02d-e70f-401a-970d-d02db28b560f",
-  "grant_type": "authorization_code"
-}
  
-fetch('https://api.raindrop.io/rest/v1/collections?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0', { headers })
+fetch('https://api.raindrop.io/rest/v1/collections?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0')
     .then(response => response.json())
     .then(data => element.innerHTML = data);
 
 </script>
 
 <div id="result">
-RESULT
+JSON RESULT
 </div>
 
   
