@@ -8,7 +8,7 @@ const element = document.querySelector('#result');
 // const r = fetch('https://api.raindrop.io/rest/v1/collections?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0');
 // console.log(r);
 
-fetch('ttps://api.raindrop.io/rest/v1/collection/37236980?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0', { 
+fetch('https://api.raindrop.io/rest/v1/collection/37236980?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0', { 
   method: 'GET'
 }).then(function(response) {
   console.log(response)
@@ -23,7 +23,7 @@ fetch('https://app.raindrop.io/my/37236980?access_token=45d6a9e1-173b-4f25-af96-
     .then( out => console.log('Checkout this JSON! ', out) );
 */
   //  .then( res => res.json() )  
-fetch('ttps://api.raindrop.io/rest/v1/collection/37236980?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0')
+fetch('https://api.raindrop.io/rest/v1/collection/37236980?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0')
     .then( out => console.log('Checkout this JSON! ', out) );
 
 </script>
