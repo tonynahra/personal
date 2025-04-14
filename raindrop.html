@@ -1,4 +1,4 @@
-<body>
+UL<body>
 
   <script>
 
@@ -11,13 +11,14 @@ const headers = {
   "expires_in": 1209599, //in seconds, use this instead!!!
   "token_type": "Bearer" };
     
-fetch('https://https://api.raindrop.io/rest/v1/collections', { headers })
+fetch('https://api.raindrop.io/rest/v1/collections', { headers })
     .then(response => response.json())
     .then(data => element.innerHTML = data.name);
 
 </script>
 
 <div id="result">
+RESULT
 </div>
 
   
