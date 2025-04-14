@@ -5,13 +5,14 @@ UL<body>
 const element = document.querySelector('#result');
 // const headers = { 'Authorization': 'Bearer my-token' };
 const headers = {
-  "client_id": "67fd0d4c88772990d50ec059",
-  "client_secret": "e6b5a02d-e70f-401a-970d-d02db28b560f",
-  "expires": 1209599768, //in miliseconds, deprecated
-  "expires_in": 1209599, //in seconds, use this instead!!!
-  "token_type": "Bearer" };
-    
-fetch('https://api.raindrop.io/rest/v1/collections', { headers })
+  "code": "c8983220-1cca-4626-a19d-801a6aae003c",
+  "client_id": "5e1c589cf6f48c0211311383",
+  "redirect_uri": "https://oauthdebugger.com/debug",
+  "client_secret": "c3363988-9d27-4bc6-a0ae-d126ce78dc09",
+  "grant_type": "authorization_code"
+}
+ 
+fetch('raindrop.io/oauth/access_token', { headers })
     .then(response => response.json())
     .then(data => element.innerHTML = data.name);
 
