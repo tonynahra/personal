@@ -3,16 +3,17 @@
   <script>
 
 const element = document.querySelector('#result');
- 
+
+    
+    
+fetch('https://app.raindrop.io/my/37236980?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0')
+    .then(response => response.json())
+    .then( out => console.log('Checkout this JSON! ', out) );
+    
 fetch('https://api.raindrop.io/rest/v1/collections?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0')
     .then( res => res.json() )
     .then( out => console.log('Checkout this JSON! ', out) );
 
-    
-fetch('https://app.raindrop.io/my/37236980?access_token=45d6a9e1-173b-4f25-af96-9040fdb768a0')
-    .then(response => response.json())
-    .then(data => document.getElementById('Programming').innerHTML = data );
-    
 </script>
 
 <div id="result">
