@@ -36,9 +36,9 @@ function C(dFldr) {
         console.log('ALB CNT: ' + alb.length);
 }
 
+alb = [] ;
 function showSel(dFldr) {
 	albLinks = "" ;
-	alb = [] ;
         for ( i=0 ; i <= alb.length -1 ; i++ ) {
               console.log( alb[i] ) ;
 	        albLinks += "<option value='" + alb[i] + "' >" + alb[i] + "</option>" ;	
@@ -70,9 +70,9 @@ function(err, data) {
     console.log('Something went wrong: ' + err);
   } else {
     ghJSON = data ;
+    C( defaultFldr ) ;	  
     showSel( defaultFldr ) ;	  
-    C( defaultFldr ) ;
-   
+
   }
   
 });
