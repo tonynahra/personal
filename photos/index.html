@@ -62,10 +62,12 @@ function(err, data) {
     let alb = [] ;
     for ( i=0 ; i++ ; i < ( data.tree.length - 1) ) {
           PTH = data.tree[i].path ;
-          if ( PTH.slice(-1) == "/" ) alb.push(PTH) ;
           console.log( "Cnt: " + i + ".." +  PTH  ) ;
-          // console.log( data.tree[i].path ) ;
+    }
 
+     for ( i=0 ; i++ ; i < ( data.tree.length - 1) ) {
+          PTH = data.tree[i].path ;
+         if ( PTH.slice(-1) == "/" ) { alb.push(PTH) ; }
     }
         console.log( "==============ALB==============" ) ;
         for ( i=0 ; i++ ; i < alb.length ) {
