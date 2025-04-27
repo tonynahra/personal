@@ -8,7 +8,9 @@ fetch('https://api.github.com/repos/tonynahra/personal/git/trees/master?recursiv
       for (let i = 0; i < data.length; i++) {
           const element = data[i];
           // Access element properties, e.g., element.name, element.value
-          document.write(element);
+          console.log(element.path);  
+          document.write(element.path);
+          document.write(element.url);            
           document.write("<hr>");
         }
 
