@@ -60,7 +60,7 @@ function(err, data) {
     console.log('Something went wrong: ' + err);
   } else {
     alb = [] ;
-    for ( i=0 ; i++ ; i <= data.tree.length ) {
+    for ( i=0 ; i++ ; i < ( data.tree.length - 1) ) {
           PTH = data.tree[i].path ;
           if ( PTH.slice(-1) == "/" ) alb[] = PTH ;
           console.log( "Cnt: " + i + ".." +  PTH  ) ;
