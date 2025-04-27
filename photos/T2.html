@@ -1,44 +1,9 @@
 
-
+<head>
+	<title>Photo Album</title>
 <script>
-/*      
-fetch('https://api.github.com/repos/tonynahra/personal/git/trees/master?recursive=1')
-      .then(
-            response => response.json() 
-      )
-      .then(data => {
-      console.log(data.length);    
-      for (let i = 0; i < data.length; i++) {
-          console.log("LOOP");    
-          const element = data[i];
-          // Access element properties, e.g., element.name, element.value
-          console.log(element.path);  
-          document.write(element.path);
-          document.write(element.url);            
-          document.write("<hr>");
-        }
-
-        
-      })
-      .catch(error => console.error('Error fetching JSON:', error));
-
-      
-     async function getData() {
-      const response = await fetch('https://api.github.com/repos/tonynahra/personal/git/trees/master?recursive=1');
-      const data = await response.json();
-      return data;
-    }
-
-      
-
-     data = getData();
-      console.log( data ) ;
-      console.log( data.tree ) ;
-      console.log( data.tree[0] ) ;
-      console.log( JSON.stringify(data) ) ;
-
-*/
-
+	
+// https://api.github.com/repositories/643587168/git/trees/main?recursive=1
 const excluded = ["photos", "lib"];
 
 function C(dFldr) {
@@ -136,10 +101,11 @@ function(err, data) {
   }
   #albums { font-size: 150% ; }	
 </style>
+</head>
+
 <body>
 <div id='albums' >ALBUMS</div>
- https://api.github.com/repositories/643587168/git/trees/main?recursive=1
-
-      <div id='photos' ></div>
+<hr />	
+       <div id='photos' ></div>
       
 </body>
