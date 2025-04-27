@@ -66,13 +66,13 @@ function(err, data) {
 
      let alb = [] ;
      
-     for ( i=1 ; i++ ; i < ( data.tree.length - 1) ) {
+     for ( i=1 ; i < ( data.tree.length - 2)  ; i++ ) {
          PTH = data.tree[i].path ;
          if ( PTH.slice(-1) == "/" ) { alb.push(PTH) ; }
     }
         console.log( "=====****=========ALB==========****====" ) ;
         console.log('ALB CNT: ' + alb.length);
-        for ( i=0 ; i++ ; i < alb.length ) {
+        for ( i=0  ; i <  ( data.tree.length - 2)  ; i++ ) {
               console.log( alb[i] ) ;
         }      
   }
