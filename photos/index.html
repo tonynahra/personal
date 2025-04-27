@@ -67,11 +67,11 @@ function(err, data) {
      alb = [] ;
      for ( i=1 ; i <= ( data.tree.length - 1 ) ; i++ ) {
          PTH = data.tree[i].path ;
-         if ( !PTH.includes(".") ) alb.push(PTH) ; 
+         if ( !PTH.includes(".") && !PTH.startsWith("img")  ) alb.push(PTH) ; 
     }
         console.log( "=====****=========ALB==========****====" ) ;
         console.log('ALB CNT: ' + alb.length);
-        for ( i=0 ; i <= alb.length ; i++ ) {
+        for ( i=0 ; i <= alb.length -1 ; i++ ) {
               console.log( alb[i] ) ;
         }      
   }
