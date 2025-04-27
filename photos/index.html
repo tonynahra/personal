@@ -65,10 +65,18 @@ function(err, data) {
     }
 
      alb = [] ;
+     imgStr = "" ;   
      for ( i=1 ; i <= ( data.tree.length - 1 ) ; i++ ) {
          PTH = data.tree[i].path ;
-         if ( !PTH.includes(".") && !PTH.startsWith("img")  ) alb.push(PTH) ; 
-    }
+         if ( !PTH.includes(".") && !PTH.startsWith("img")  ) {
+               alb.push(PTH) ;
+         } else {
+            imgStr += "<img src='/" + PTH + "' >" ;   
+         }
+           
+      }
+        console.log( imgStr ) ;
+        document.getElementById("photos").innerHTML = imgStr ;
         console.log( "=====****=========ALB==========****====" ) ;
         console.log('ALB CNT: ' + alb.length);
         for ( i=0 ; i <= alb.length -1 ; i++ ) {
@@ -88,9 +96,13 @@ function(err, data) {
 
       
 </script>      
-
+<style>
+      img { width: 700px ; }
+</style>
 <body>
 
  https://api.github.com/repositories/643587168/git/trees/main?recursive=1
 
+      <div id='photos' ></div>
+      
 </body>
