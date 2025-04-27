@@ -63,7 +63,9 @@ function(err, data) {
         console.log( data.tree[0].length );
          console.log( data.tree[1].length );
          console.log( data.tree[1].path );
-    for ( i=0 ; i++ ; i < data.tree[0].length ) {      
+    for ( i=1 ; i++ ; i < data.tree.length ) {      
+          console.log( "Cnt: " + i ) ;
+          console.log( data.tree[i].path ) ;
           console.log( data.tree[0][i].path ) ;
           console.log( data.tree[1][i].path ) ;
     }
