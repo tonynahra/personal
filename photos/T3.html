@@ -13,7 +13,6 @@ function CA(itm) {
 }
   
 function C(dFldr) {
-
       console.log('CNT: ' + ghJSON.tree.length);
     for ( i=1 ; i <= ( ghJSON.tree.length -1 ) ; i++  ) {
           console.log( "Cnt: " + i + ".." +  ghJSON.tree[i].path ) ;
@@ -31,10 +30,13 @@ function C(dFldr) {
          }
            
       }
-        console.log( imgStr ) ;
+	console.log( imgStr ) ;
         document.getElementById("photos").innerHTML = imgStr ;
         console.log( "=====****=========ALB==========****====" ) ;
         console.log('ALB CNT: ' + alb.length);
+}
+
+function showSel(dFldr) {
 	albLinks = "" ;
         for ( i=0 ; i <= alb.length -1 ; i++ ) {
               console.log( alb[i] ) ;
@@ -43,8 +45,6 @@ function C(dFldr) {
 	console.log( "<select id='S' onchange='CA()' >" + albLinks + "</select>" );
 	document.getElementById("albums").innerHTML = "<select id=S onchange='CA(this)' >" + albLinks + "</select>" ;
 }
-
-
   
 var getJSON = function(url, callback) {
     var xhr = new XMLHttpRequest();
@@ -68,7 +68,8 @@ function(err, data) {
   if (err !== null) {
     console.log('Something went wrong: ' + err);
   } else {
-    ghJSON = data ;		
+    ghJSON = data ;
+    showSel( defaultFldr ) ;	  
     C( defaultFldr ) ;
    
   }
