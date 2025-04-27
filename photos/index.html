@@ -71,7 +71,8 @@ function(err, data) {
          if ( !PTH.includes(".") && !PTH.startsWith("img")  ) {
                alb.push(PTH) ;
          } else {
-            imgStr += "<img src='/" + PTH + "' >" ;   
+            if ( PTH.includes(".jpg") )
+              imgStr += "<img src='/" + PTH + "' >" ;   
          }
            
       }
