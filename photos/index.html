@@ -64,8 +64,7 @@ function(err, data) {
           console.log( "Cnt: " + i + ".." +  data.tree[i].path ) ;
     }
 
-     let alb = [] ;
-     
+     alb = [] ;
      for ( i=1 ; i < ( data.tree.length - 2)  ; i++ ) {
          PTH = data.tree[i].path ;
          if ( PTH.slice(-1) == "/" ) { alb.push(PTH) ; }
