@@ -59,10 +59,11 @@ function(err, data) {
   if (err !== null) {
     console.log('Something went wrong: ' + err);
   } else {
-    for ( let i=0 ; i++ ; i < data.tree[0].length ) {      
+    for ( i=0 ; i++ ; i < data.tree[0].length ) {      
           console.log( data.tree[i].path ) ;
     }
   }
+}
 );
 
 
