@@ -59,10 +59,10 @@ function(err, data) {
   if (err !== null) {
     console.log('Something went wrong: ' + err);
   } else {
-    console.log('01: ' + data.count);
-    console.log('02: ' + data.tree.count);        
-        console.log('03: ' + data.tree[0].count);        
-        console.log('04: ' + data.tree[1].count);        
+    console.log('01: ' + data.length);
+    console.log('02: ' + data.tree.length);        
+        console.log('03: ' + data.tree[0].length);        
+        console.log('04: ' + data.tree[1].length);        
     console.log( data.tree[0].url ) ;    
     console.log( data.tree[5].path ) ;
   }
