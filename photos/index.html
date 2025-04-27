@@ -59,15 +59,18 @@ function(err, data) {
   if (err !== null) {
     console.log('Something went wrong: ' + err);
   } else {
-        console.log( "LEN" + data.tree.length );
-        console.log( data.tree[0].length );
-         console.log( data.tree[1].length );
-         console.log( data.tree[1].path );
-    for ( i=0 ; i++ ; i <= data.tree.length ) {      
-          console.log( "Cnt: " + i + ".." +  data.tree[i].path  ) ;
+    alb = [] ;
+    for ( i=0 ; i++ ; i <= data.tree.length ) {
+          PTH = data.tree[i].path ;
+          if ( PTH.slice(-1) == "/" ) alb[] = PTH ;
+          console.log( "Cnt: " + i + ".." +  PTH  ) ;
           // console.log( data.tree[i].path ) ;
 
     }
+        console.log( "==============ALB==============" ) ;
+        for ( i=0 ; i++ ; i < alb.length ) {
+              console.log( alb[i] ) ;
+        }      
   }
 }
 );
