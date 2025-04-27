@@ -42,15 +42,15 @@ fetch('https://api.github.com/repos/tonynahra/personal/git/trees/master?recursiv
 
 function showFolder(dFldr) {
 
-      console.log('CNT: ' + data.tree.length);
-    for ( i=1 ; i <= ( data.tree.length -1 ) ; i++  ) {
-          console.log( "Cnt: " + i + ".." +  data.tree[i].path ) ;
+      console.log('CNT: ' + ghJSON.tree.length);
+    for ( i=1 ; i <= ( ghJSON.tree.length -1 ) ; i++  ) {
+          console.log( "Cnt: " + i + ".." +  ghJSON.tree[i].path ) ;
     }
 
      alb = [] ;
      imgStr = "" ;   
-     for ( i=1 ; i <= ( data.tree.length - 1 ) ; i++ ) {
-         PTH = data.tree[i].path ;
+     for ( i=1 ; i <= ( ghJSON.tree.length - 1 ) ; i++ ) {
+         PTH = ghJSON.tree[i].path ;
          if ( !PTH.includes(".") && !PTH.startsWith("img")  ) {
                alb.push(PTH) ;
          } else {
@@ -92,7 +92,7 @@ function(err, data) {
   if (err !== null) {
     console.log('Something went wrong: ' + err);
   } else {
-
+    ghJSON = data ;		
     showFolder( defaultFldr ) ;
    
   }
