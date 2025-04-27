@@ -39,6 +39,7 @@ fetch('https://api.github.com/repos/tonynahra/personal/git/trees/master?recursiv
 
 */
 
+const excluded = ["photos", "lib"];
 
 function C(dFldr) {
 
@@ -51,7 +52,7 @@ function C(dFldr) {
      imgStr = "" ;   
      for ( i=1 ; i <= ( ghJSON.tree.length - 1 ) ; i++ ) {
          PTH = ghJSON.tree[i].path ;
-         if ( !PTH.includes(".") && !PTH.startsWith("img")  ) {
+         if ( !PTH.includes(".") && !PTH.startsWith("img") && !excluded.includes(PTH);   ) {
                alb.push(PTH.replace("photos/" , "") ) ;
          } else {
             if ( PTH.includes(".jpg") && PTH.startsWith("photos/"+dFldr+"/")  )
@@ -133,6 +134,7 @@ function(err, data) {
     display: list-item;
     margin-left : 1em; 
   }
+  #albums { font-size: 150% ; }	
 </style>
 <body>
 <div id='albums' >ALBUMS</div>
