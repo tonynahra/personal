@@ -2,8 +2,10 @@
 <head>
 	<title>Photo Album</title>
 <script>
-	
+
 // https://api.github.com/repositories/643587168/git/trees/main?recursive=1
+
+defaultFldr = "Mississppi" ;
 const excluded = ["photos", "lib"];
 
 function CA(itm) {
@@ -40,8 +42,8 @@ alb = [] ;
 function showSel(dFldr) {
 	albLinks = "" ;
         for ( i=0 ; i <= alb.length -1 ; i++ ) {
-              console.log( alb[i] ) ;
-	        albLinks += "<option value='" + alb[i] + "' >" + alb[i] + "</option>" ;	
+            if ( defaultFldr == alb[i] ) { SEL = " selected " ; } else { SEL = "" ; }
+	        albLinks += "<option value='" + alb[i] + "' " + SEL + " >" + alb[i] + "</option>" ;	
         }
 	console.log( "<select id='S' onchange='CA()' >" + albLinks + "</select>" );
 	document.getElementById("albums").innerHTML = "<select id=S onchange='CA(this)' >" + albLinks + "</select>" ;
@@ -62,8 +64,6 @@ var getJSON = function(url, callback) {
     xhr.send();
 };
 
-defaultFldr = "Mississppi" ;
-      
 getJSON('https://api.github.com/repos/tonynahra/personal/git/trees/master?recursive=1',
 function(err, data) {
   if (err !== null) {
