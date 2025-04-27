@@ -6,7 +6,8 @@
 // https://api.github.com/repositories/643587168/git/trees/main?recursive=1
 const excluded = ["photos", "lib"];
 
-function CA() {
+function CA(itm) {
+	console.log( "itm:" + itm.value ) ;
   console.log( document.getElementById("S").value ) ;
   C( document.getElementById("S").value ) ;
 }
@@ -39,8 +40,8 @@ function C(dFldr) {
               console.log( alb[i] ) ;
 	        albLinks += "<option value='" + alb[i] + "' >" + alb[i] + "</option>" ;	
         }
-	console.log( "<select id='S' onChange='CA()' >" + albLinks + "</select>" );
-	document.getElementById("albums").innerHTML = "<select id=S onchange='CA' >" + albLinks + "</select>" ;
+	console.log( "<select id='S' onchange='CA()' >" + albLinks + "</select>" );
+	document.getElementById("albums").innerHTML = "<select id=S onchange='CA(this)' >" + albLinks + "</select>" ;
 }
 
 
