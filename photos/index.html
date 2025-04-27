@@ -59,8 +59,11 @@ function(err, data) {
   if (err !== null) {
     console.log('Something went wrong: ' + err);
   } else {
-        console.log( data.tree[1].length );
-    for ( i=0 ; i++ ; i < data.tree[1].length ) {      
+        console.log( data.tree.length );
+        console.log( data.tree[0].length );
+         console.log( data.tree[1].length );
+         console.log( data.tree[1].path );
+    for ( i=0 ; i++ ; i < data.tree.length ) {      
           console.log( data.tree[i].path ) ;
     }
   }
