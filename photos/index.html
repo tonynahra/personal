@@ -59,17 +59,19 @@ function(err, data) {
   if (err !== null) {
     console.log('Something went wrong: ' + err);
   } else {
-    let alb = [] ;
-    for ( i=0 ; i++ ; i < ( data.tree.length - 1) ) {
+      console.log('CNT: ' + data.tree.length);
+    for ( i=0 ; i++ ; i < data.tree.length  ) {
           PTH = data.tree[i].path ;
           console.log( "Cnt: " + i + ".." +  PTH  ) ;
     }
 
+     let alb = [] ;
      for ( i=0 ; i++ ; i < ( data.tree.length - 1) ) {
           PTH = data.tree[i].path ;
          if ( PTH.slice(-1) == "/" ) { alb.push(PTH) ; }
     }
         console.log( "=====****=========ALB==========****====" ) ;
+        console.log('ALB CNT: ' + alb.length);
         for ( i=0 ; i++ ; i < alb.length ) {
               console.log( alb[i] ) ;
         }      
