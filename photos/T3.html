@@ -18,7 +18,7 @@ function C(dFldr) {
           console.log( "Cnt: " + i + ".." +  ghJSON.tree[i].path ) ;
     }
 
-     alb = [] ;
+
      imgStr = "" ;   
      for ( i=1 ; i <= ( ghJSON.tree.length - 1 ) ; i++ ) {
          PTH = ghJSON.tree[i].path ;
@@ -38,6 +38,7 @@ function C(dFldr) {
 
 function showSel(dFldr) {
 	albLinks = "" ;
+	alb = [] ;
         for ( i=0 ; i <= alb.length -1 ; i++ ) {
               console.log( alb[i] ) ;
 	        albLinks += "<option value='" + alb[i] + "' >" + alb[i] + "</option>" ;	
