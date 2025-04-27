@@ -63,9 +63,13 @@ function showFolder(dFldr) {
         document.getElementById("photos").innerHTML = imgStr ;
         console.log( "=====****=========ALB==========****====" ) ;
         console.log('ALB CNT: ' + alb.length);
+	albLinks = "" ;
         for ( i=0 ; i <= alb.length -1 ; i++ ) {
               console.log( alb[i] ) ;
-        } 
+	   albLinks += "<a href='#' onclick='C(\"" + alb[i] + "\");' >" + alb[i] + "</a>&nbsp;" ;	
+        }
+	console.log(albLinks);
+	document.getElementById("albums").innerHTML = albLinks ;
 }
 
 
@@ -131,7 +135,7 @@ function(err, data) {
   }
 </style>
 <body>
-
+<div id='albums' >ALBUMS</div>
  https://api.github.com/repositories/643587168/git/trees/main?recursive=1
 
       <div id='photos' ></div>
