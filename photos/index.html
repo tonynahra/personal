@@ -60,18 +60,18 @@ function(err, data) {
     console.log('Something went wrong: ' + err);
   } else {
       console.log('CNT: ' + data.tree.length);
-    for ( i=1 ; i <= data.tree.length  ; i++  ) {
+    for ( i=1 ; i <= ( data.tree.length -1 ) ; i++  ) {
           console.log( "Cnt: " + i + ".." +  data.tree[i].path ) ;
     }
 
      alb = [] ;
-     for ( i=1 ; i <= data.tree.length ; i++ ) {
+     for ( i=1 ; i <= ( data.tree.length - 1 ) ; i++ ) {
          PTH = data.tree[i].path ;
          if ( !PTH.includes(".") ) alb.push(PTH) ; 
     }
         console.log( "=====****=========ALB==========****====" ) ;
         console.log('ALB CNT: ' + alb.length);
-        for ( i=0 ; i <= data.tree.length ; i++ ) {
+        for ( i=0 ; i <= alb.length ; i++ ) {
               console.log( alb[i] ) ;
         }      
   }
