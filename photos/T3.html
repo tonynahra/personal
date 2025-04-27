@@ -1,0 +1,116 @@
+
+<head>
+	<title>Photo Album</title>
+<script>
+	
+// https://api.github.com/repositories/643587168/git/trees/main?recursive=1
+const excluded = ["photos", "lib"];
+
+function CA() {
+  console.log( document.getElementById("S").value ) ;
+  C( document.getElementById("S").value ) ;
+}
+  
+function C(dFldr) {
+
+      console.log('CNT: ' + ghJSON.tree.length);
+    for ( i=1 ; i <= ( ghJSON.tree.length -1 ) ; i++  ) {
+          console.log( "Cnt: " + i + ".." +  ghJSON.tree[i].path ) ;
+    }
+
+     alb = [] ;
+     imgStr = "" ;   
+     for ( i=1 ; i <= ( ghJSON.tree.length - 1 ) ; i++ ) {
+         PTH = ghJSON.tree[i].path ;
+         if ( !PTH.includes(".") && !PTH.startsWith("img") && !excluded.includes(PTH) ) {
+               alb.push(PTH.replace("photos/" , "") ) ;
+         } else {
+            if ( PTH.includes(".jpg") && PTH.startsWith("photos/"+dFldr+"/")  )
+               imgStr += "<img src='/personal/" + PTH + "' >" ;   
+         }
+           
+      }
+        console.log( imgStr ) ;
+        document.getElementById("photos").innerHTML = imgStr ;
+        console.log( "=====****=========ALB==========****====" ) ;
+        console.log('ALB CNT: ' + alb.length);
+	albLinks = "" ;
+        for ( i=0 ; i <= alb.length -1 ; i++ ) {
+              console.log( alb[i] ) ;
+	        albLinks += "<option value='" + alb[i] + "' >" + alb[i] + "</option>" ;	
+        }
+	console.log( "<select id='S' onchange='CA()' >" + albLinks + "</select>" );
+	document.getElementById("albums").innerHTML = "<select id=S onchange='CA' >" + albLinks + "</select>" ;
+}
+
+
+  
+var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status === 200) {
+        callback(null, xhr.response);
+      } else {
+        callback(status, xhr.response);
+      }
+    };
+    xhr.send();
+};
+
+defaultFldr = "Mississppi" ;
+      
+getJSON('https://api.github.com/repos/tonynahra/personal/git/trees/master?recursive=1',
+function(err, data) {
+  if (err !== null) {
+    console.log('Something went wrong: ' + err);
+  } else {
+    ghJSON = data ;		
+    C( defaultFldr ) ;
+   
+  }
+  
+});
+
+  
+</script>      
+<style>
+        body {
+       margin: 0px 150px; 
+       background: #999; 
+       font-family: Verdana, Georgia, 'Times New Roman', Times, serif; 
+  
+	background: url(common/texture_05.jpg) no-repeat center center fixed;
+	-webkit-background-size: cover; /* For WebKit*/
+	-moz-background-size: cover;    /* Mozilla*/
+	-o-background-size: cover;      /* Opera*/
+	background-size: cover;         /* Generic*/  
+      }
+  img  { 
+      width: 300px ; margin: 10px; padding: 5px;
+      border:2px solid #fff;
+        
+	background: #fff; border-radius:15px; 
+        box-shadow:  0 10px 14px 0 rgba(0, 0, 0, 0.3), 0 11px 27px 0 rgba(0, 0, 0, 0.22); 
+	  
+     }
+  h1 {
+    font-size: 250%;	  
+    text-shadow: 1px 1px #ccc;
+   }
+  h2 {
+    display: list-item;
+    margin-left : 1em; 
+  }
+  #albums { font-size: 150% ; }	
+</style>
+</head>
+
+<body>
+<div id='albums' >ALBUMS</div>
+<hr />	
+       <div id='photos' ></div>
+      
+</body>
