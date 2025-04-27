@@ -61,13 +61,13 @@ function(err, data) {
   } else {
       console.log('CNT: ' + data.tree.length);
     for ( i=0 ; i++ ; i < data.tree.length  ) {
-          PTH = data.tree[i].path ;
-          console.log( "Cnt: " + i + ".." +  PTH  ) ;
+          console.log( "Cnt: " + i + ".." +  data.tree[i].path ) ;
     }
 
      let alb = [] ;
+     
      for ( i=0 ; i++ ; i < ( data.tree.length - 1) ) {
-          PTH = data.tree[i].path ;
+         let PTH = data.tree[i].path ;
          if ( PTH.slice(-1) == "/" ) { alb.push(PTH) ; }
     }
         console.log( "=====****=========ALB==========****====" ) ;
