@@ -67,7 +67,7 @@ function(err, data) {
      alb = [] ;
      for ( i=1 ; i < ( data.tree.length - 2)  ; i++ ) {
          PTH = data.tree[i].path ;
-         if ( PTH.slice(-1) == "/" ) { alb.push(PTH) ; }
+         if ( !PTH.includes(".") ) alb.push(PTH) ; 
     }
         console.log( "=====****=========ALB==========****====" ) ;
         console.log('ALB CNT: ' + alb.length);
