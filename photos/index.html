@@ -1,0 +1,25 @@
+
+
+<script>
+fetch('https://api.github.com/repos/tonynahra/Photo/git/trees/main?recursive=1')
+      .then(response => response.json())
+      .then(data => {
+        
+      for (let i = 0; i < data.length; i++) {
+          const element = data[i];
+          // Access element properties, e.g., element.name, element.value
+          document.write(element);
+          document.write("<hr>");
+        }
+
+        
+      })
+      .catch(error => console.error('Error fetching JSON:', error));
+
+</script>      
+
+<body>
+
+ https://api.github.com/repositories/643587168/git/trees/main?recursive=1
+
+</body>
