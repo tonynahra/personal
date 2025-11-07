@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional YouTube Gallery</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/css/uikit.min.css" />
+    
+    <script>
+        // Default playlist ID from URL (your existing logic)
+        var PARAM = "PLjfDEkXKdbviY1nPYy3c2eK0upQ0vuZHM"; // Example: Chess
+
+        // Your new JSON data for the dropdown
+        const playlistData = [
+            { 
+              "title": "Chess Openings", 
+              "id": "PLjfDEkXKdbviY1nPYy3c2eK0upQ0vuZHM" 
+            },
+            { 
+              "title": "Python Programming", 
+              "id": "PLjfDEkXKdbvhdEK9dGFwSnmNnxS7QQWbQ" 
+            },
+            { 
+              "title": "Web Development Tutorials", 
+              "id": "PLjfDEkXKdbvj9vQ00a-i-T2g-l-3h_Zc" 
+            },
+            { 
+              "title": "Data Structures", 
+              "id": "PLjfDEkXKdbvge-s-001S-2N3-mG9g_zY" 
+            }
+            // Add as many playlists as you want here
+        ];
+    </script>
+
+    <style>
+        /* --- Import your existing professional theme --- */
+        body {
+            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Add padding to the top to offset the new sticky header */
+            padding-top: 90px; 
+        }
+
+        /* --- NEW Sticky Header Styling --- */
+        .page-header {
+            position: sticky; /* The magic! */
+            top: 0;
+            z-index: 1000; /* Ensures it stays on top of all content */
+            
+            background-color: #ffffff;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem; /* Keeps space between header and content */
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Adds a subtle "lift" */
+
+            /* Use Flexbox to align title and dropdown */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title-area h1 {
+            font-size: 1.5rem; /* Slightly smaller for the nav bar */
+            font-weight: 500;
+            margin: 0;
+            color: #222;
+        }
+        .header-title-area a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .header-title-area a:hover {
+            text-decoration: underline;
+        }
+
+        .header-controls-area {
+            display: flex;
+            align-items: center;
+            color: #555;
+        }
+        .header-controls-area label {
+            margin-right: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        #playlist-selector {
+            width: 250px; /* Or adjust as needed */
+        }
+
+        /* --- All your other card, button, etc. styles --- */
+        .video-card {
+            background-color: #ffffff; 
+            border: 1px solid #e9ecef;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+        .video-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .video-card .uk-card-title {
+            font-size: 1.1rem; font-weight: 600; line-height: 1.4; color: #333;
+            max-height: 61.6px; overflow: hidden; text-overflow: ellipsis;
+            display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+        }
+        .video-card .uk-card-body { padding: 20px; }
+        .video-card .uk-card-body p {
+            font-size: 0.9rem; color: #555; line-height: 1.5;
+            max-height: 6.75rem; overflow: hidden; position: relative;
+        }
+        .video-card .uk-card-body p::after {
+            content: ''; position: absolute; bottom: 0; right: 0;
+            width: 100%; height: 1.5rem;
+            background: linear-gradient(to bottom, transparent, #ffffff);
+        }
+        .video-card .uk-card-media-top img {
+            border-bottom: 1px solid #e9ecef; width: 100%; object-fit: cover;
+        }
+        .show-more-container { text-align: center; padding: 2rem 0; }
+        #show-more-btn {
+            font-size: 1rem; padding: 10px 30px; background-color: #007bff;
+            color: #ffffff; border: none; border-radius: 5px; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #show-more-btn:hover { background-color: #0056b3; }
+        #myBtn {
+            display: none; position: fixed; bottom: 20px; right: 30px; z-index: 99;
+            border: none; outline: none; background-color: #555; color: white;
+            cursor: pointer; padding: 15px; border-radius: 10px; font-size: 18px;
+        }
+        #myBtn:hover { background-color: #333; }
+    </style>
+</head>
+<body>
+
+    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+
+    <header class="page-header">
+        <div class="header-title-area">
+            <h1>
+                <a href='/'>Home</a> &gt;&gt; 
+                <a href='/personal/'>Interests</a> &gt;&gt; 
+                <span id="page-subtitle">Loading...</span>
+            </h1>
+        </div>
+
+        <div class="header-controls-area">
+            <label for="playlist-selector">Category:</label>
+            <div class="uk-form-controls">
+                <select class="uk-select" id="playlist-selector">
+                    </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="uk-container">
+        <div id="Grid" 
+             class="uk-grid-small uk-grid-match uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l" 
+             data-uk-grid="masonry: true">
+            </div>
+    </main>
+
+    <div class="show-more-container">
+        <button id="show-more-btn" class="uk-hidden">Show More</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.19.2/js/uikit-lightbox.min.js"></script>
+
+</body>
+</html>
