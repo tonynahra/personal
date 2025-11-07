@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional YouTube Gallery</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/css/uikit.min.css" />
+
+    <style>
+        /* --- Professional Theme & Custom Styles --- */
+
+        body {
+            background-color: #f8f9fa; /* A light, professional background */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* --- Header Styling --- */
+        .page-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+        .page-header h1 {
+            font-size: 1.7rem;
+            font-weight: 500;
+            margin: 0;
+            color: #222;
+        }
+        .page-header a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .page-header a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Video Card Styling (using UIkit Card) --- */
+        .video-card {
+            /* This overrides your inline background color for a unified, professional theme */
+            background-color: #ffffff; 
+            border: 1px solid #e9ecef;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        .video-card .uk-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #333;
+            /* Ensures titles don't make cards awkwardly tall */
+            max-height: 61.6px; /* 1.1rem * 1.4 line-height * 4 lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 4; /* Limit to 4 lines */
+            -webkit-box-orient: vertical;
+        }
+
+        .video-card .uk-card-body {
+            padding: 20px;
+        }
+
+        .video-card .uk-card-body p {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+            /* This creates the "fade out" effect on long descriptions */
+            max-height: 6.75rem; /* 0.9rem * 1.5 line-height * 5 lines */
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Fades out the description text to show there is more */
+        .video-card .uk-card-body p::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 1.5rem;
+            background: linear-gradient(to bottom, transparent, #ffffff);
+        }
+
+        .video-card .uk-card-media-top img {
+            border-bottom: 1px solid #e9ecef;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        /* --- "Show More" Button Styling --- */
+        .show-more-container {
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        #show-more-btn {
+            font-size: 1rem;
+            padding: 10px 30px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #show-more-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- "Back to Top" Button Styling (from your CSS) --- */
+        #myBtn {
+            display: none; 
+            position: fixed; 
+            bottom: 20px; 
+            right: 30px; 
+            z-index: 99; 
+            border: none; 
+            outline: none; 
+            background-color: #555; 
+            color: white; 
+            cursor: pointer; 
+            padding: 15px; 
+            border-radius: 10px; 
+            font-size: 18px; 
+        }
+        #myBtn:hover {
+            background-color: #333;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+
+    <header class="page-header uk-flex uk-flex-middle">
+        <h1><a href='/'>Home</a> &gt;&gt; <a href='/personal/'>Interests</a> &gt;&gt; Chess</h1>
+    </header>
+
+    <main class="uk-container">
+        <div id="Grid" 
+             class="uk-grid-small uk-grid-match uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l" 
+             data-uk-grid="masonry: true">
+            </div>
+    </main>
+
+    <div class="show-more-container">
+        <button id="show-more-btn" class="uk-hidden">Show More</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.19.2/js/uikit-lightbox.min.js"></script>
+
+    <script>
+        // --- YouTube API Logic ---
+
+        // !!! START OF CRITICAL SECTION !!!
+        // 1. DELETE YOUR OLD KEY.
+        // 2. CREATE A NEW KEY.
+        // 3. For development, paste your NEW key here.
+        // 4. For a LIVE website, you must hide this key on a server.
+        const API_KEY = 'AIzaSyD7XIk7Bu3xc_1ztJl6nY6gDN4tFWq4_tY';
+        // !!! END OF CRITICAL SECTION !!!
+
+        // The YouTube API endpoint
+        const URL = 'https://www.googleapis.com/youtube/v3/playlistItems';
+
+        // Get Playlist ID from your PARAM variable
+        // (Using "PLjfDEkXKdbviY1nPYy3c2eK0upQ0vuZHM" as the default from your example)
+        var PARAM = "PLjfDEkXKdbviY1nPYy3c2eK0upQ0vuZHM";
+        var PARAMa = PARAM.split(",");
+        const PLAYLIST_ID = PARAMa[0];
+
+        // This variable will store the token for the "next page" of results
+        var nextPageToken = null;
+
+        /**
+         * Loads videos from the YouTube playlist.
+         * @param {string} pageToken - The token for the next page of results. If null, loads the first page.
+         */
+        function loadVideos(pageToken) {
+            
+            // On the first load (pageToken is null), get 30.
+            // On "Show More" clicks, get the next 20.
+            const resultsPerPage = pageToken ? 20 : 30;
+
+            var options = {
+                part: 'snippet',
+                key: API_KEY,
+                maxResults: resultsPerPage,
+                playlistId: PLAYLIST_ID,
+                pageToken: pageToken || '' // Add the token if it exists
+            };
+
+            // Show a loading indicator on the button
+            if(pageToken) {
+                $('#show-more-btn').text('Loading...').prop('disabled', true);
+            }
+
+            $.getJSON(URL, options, function (data) {
+                // Append the new videos to the grid
+                resultsLoop(data);
+
+                // Check if there is another page of results
+                if (data.nextPageToken) {
+                    nextPageToken = data.nextPageToken;
+                    // Show the "Show More" button and reset its text
+                    $('#show-more-btn').removeClass('uk-hidden').text('Show More').prop('disabled', false);
+                } else {
+                    // No more results, so hide the button
+                    nextPageToken = null;
+                    $('#show-more-btn').addClass('uk-hidden');
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                // Handle API errors (e.g., key invalid, quota exceeded)
+                console.error("Error fetching YouTube data: ", textStatus, errorThrown);
+                $('#Grid').append(
+                    `<div class="uk-alert-danger" uk-alert>
+                        <p><strong>Error:</strong> Could not load videos. Please check the API key or playlist ID.</p>
+                    </div>`
+                );
+                $('#show-more-btn').addClass('uk-hidden'); // Hide button on error
+            });
+        }
+
+        /**
+         * Loops through the data and appends video cards to the grid.
+         */
+        function resultsLoop(data) {
+            $.each(data.items, function (i, item) {
+                // Ensure thumbnail data exists
+                if (!item.snippet.thumbnails || !item.snippet.thumbnails.medium) {
+                    console.warn('Skipping video with missing thumbnail:', item.snippet.title);
+                    return; // skip this item
+                }
+              
+                var thumb = item.snippet.thumbnails.medium.url;
+                var title = item.snippet.title;
+                // Truncate description in JS as a fallback (CSS is better)
+                var desc = item.snippet.description.substring(0, 200); 
+                var vid = item.snippet.resourceId.videoId;
+
+                // This is the new, professional card HTML using UIkit
+                var cardHtml = `
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-hover video-card">
+                            <div class="uk-card-media-top">
+                                <a href="https://www.youtube.com/embed/${vid}" data-uk-lightbox="type: iframe">
+                                    <img src="${thumb}" alt="${title}">
+                                </a>
+                            </div>
+                            <div class="uk-card-body">
+                                <h3 class="uk-card-title uk-margin-small-bottom">${title}</h3>
+                                <p class="uk-text-small uk-text-muted">${desc}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Append the new card to the grid
+                $('#Grid').append(cardHtml);
+            });
+        }
+
+        // --- Event Handlers ---
+
+        $(document).ready(function () {
+            // Initial load of the first 30 videos
+            loadVideos(null);
+            
+            // "Show More" button click event
+            $('#show-more-btn').on('click', function () {
+                if (nextPageToken) {
+                    loadVideos(nextPageToken);
+                }
+            });
+
+            // --- Your "Back to Top" button logic ---
+            var mybutton = document.getElementById("myBtn");
+            window.onscroll = function() {
+                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                    mybutton.style.display = "block";
+                } else {
+                    mybutton.style.display = "none";
+                }
+            };
+        });
+
+        // Your "Back to Top" click function
+        function topFunction() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+
+    </script>
+</body>
+</html>
