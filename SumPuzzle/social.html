@@ -8,7 +8,7 @@
     <meta name="description" content="Exercise your brain with SumPuzzle. Solve the daily arithmetic cipher.">
     <meta property="og:title" content="SumPuzzle - Daily Challenge">
     <meta property="og:description" content="Can you crack today's code? Play the daily math puzzle.">
-    <meta property="og:image" content="https://mediamaze.com/SP/preview.jpg"> 
+    <meta property="og:image" content="https://mediamaze.com/SP/SP.jpg"> 
     
     <style>
         :root {
@@ -35,7 +35,13 @@
         .score-label { font-size: 0.7rem; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; }
         .score-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
         .high-score { font-size: 0.75rem; color: #636e72; margin-top: 2px; }
-        .level-badge { background: var(--light); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        
+        /* Updated Level Badge */
+        .level-badge { 
+            background: var(--light); padding: 6px 15px; border-radius: 20px; 
+            font-size: 0.85rem; font-weight: bold; color: var(--dark);
+            white-space: nowrap; /* Prevents breaking */
+        }
 
         /* Timer */
         .timer-container { position: relative; width: 50px; height: 50px; }
@@ -107,6 +113,20 @@
         .stat-card { background: var(--bg); padding: 10px; border-radius: 8px; text-align: center; }
         .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
         .stat-lbl { font-size: 0.7rem; color: #636e72; text-transform: uppercase; }
+
+        /* Clean Tables */
+        .rules-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 20px; }
+        .rules-table th { background: #f0f3f5; color: #636e72; padding: 10px; text-align: left; font-size: 0.8rem; }
+        .rules-table td { padding: 10px; border-bottom: 1px solid #dfe6e9; color: var(--dark); }
+        .rules-table tr:last-child td { border-bottom: none; }
+        .tag { padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; color: white; display: inline-block; }
+
+        /* Scoring Box */
+        .scoring-box { background: var(--bg); border-radius: 10px; padding: 15px; margin-top: 10px; }
+        .score-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 5px; }
+        .score-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .plus { color: var(--correct); font-weight: bold; }
+        .minus { color: var(--wrong); font-weight: bold; }
 
         .lb-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         .lb-table th { text-align: left; color: #b2bec3; padding-bottom: 5px; font-size: 0.8rem; }
@@ -233,23 +253,54 @@
                     <div id="lbLoading" style="text-align:center; color:#b2bec3;">Loading...</div>
                     <table class="lb-table" id="lbTable"></table>
                     <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="fetchLeaderboard()">Refresh</button>
+                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="resumeGame()">Resume Game</button>
                 </div>
                 
                 <div id="rules" class="tab-content">
-                    <h3 style="margin-top:0;">Rules & Levels</h3>
-                    <p style="color:#636e72;">Letters represent digits 0-9. No letter represents the same digit.</p>
-                    <ul style="color:#636e72; padding-left:20px;">
-                        <li>Lvl 1 (Easy): 2 Digits</li>
-                        <li>Lvl 2 (Med): 3 Digits</li>
-                        <li>Lvl 3 (Hard): 4 Digits</li>
-                        <li>Lvl 4 (Expert): 5 Digits</li>
-                        <li>Lvl 5 (Master): 6 Digits</li>
-                    </ul>
-                    <div style="margin-top:20px; font-size:0.9rem; color:#636e72;">
-                        <strong>Scoring:</strong><br>
-                        Correct: +100pts + Speed Bonus.<br>
-                        Wrong: -25pts. Hint/Skip: -50pts.
+                    <h3 style="margin-top:0;">Level Guide</h3>
+                    
+                    <table class="rules-table">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Digits</th>
+                                <th>Time</th>
+                                <th>Diff</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td> <td>2</td> <td>90s</td> 
+                                <td><span class="tag" style="background:#00b894;">Easy</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td> <td>3</td> <td>120s</td> 
+                                <td><span class="tag" style="background:#00cec9;">Med</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td> <td>4</td> <td>180s</td> 
+                                <td><span class="tag" style="background:#0984e3;">Hard</span></td>
+                            </tr>
+                            <tr>
+                                <td>4</td> <td>5</td> <td>240s</td> 
+                                <td><span class="tag" style="background:#6c5ce7;">Expert</span></td>
+                            </tr>
+                            <tr>
+                                <td>5</td> <td>6</td> <td>300s</td> 
+                                <td><span class="tag" style="background:#d63031;">Master</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="margin-bottom:10px;">Scoring Logic</h3>
+                    <div class="scoring-box">
+                        <div class="score-row"><span>Correct Answer</span> <span class="plus">+100 pts</span></div>
+                        <div class="score-row"><span>Speed Bonus</span> <span class="plus">+Time</span></div>
+                        <div class="score-row"><span>Wrong Guess</span> <span class="minus">-25 pts</span></div>
+                        <div class="score-row"><span>Hint / Skip</span> <span class="minus">-50 pts</span></div>
                     </div>
+
+                    <button class="num-btn" style="width:100%; margin-top:20px; background:var(--primary); color:white; border:none;" onclick="resumeGame()">Resume Game</button>
                 </div>
             </div>
         </div>
@@ -309,12 +360,10 @@
                 .then(data => {
                     gameState.dailySeedBase = data.seed;
                     dailyGameId = data.gameId;
-                    el.level.innerText = `Daily #${dailyGameId}`;
                     checkIntro();
                 })
                 .catch(err => {
                     console.warn("Offline mode or Server Error");
-                    // Fallback to local date seed
                     const now = new Date();
                     gameState.dailySeedBase = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
                     dailyGameId = 0;
@@ -339,9 +388,10 @@
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
             updateStats(gameState.score); 
-            el.level.innerText = `Daily #${dailyGameId} - Lvl ${gameState.level}`;
+            // UPDATED HEADER FORMAT
+            el.level.innerText = `Daily #${dailyGameId} | Level ${gameState.level}`;
 
-            // Reset Seed based on Level to ensure Level 2 is always Level 2
+            // Reset Seed based on Level
             currentSeed = gameState.dailySeedBase + (gameState.level * 10000);
 
             const config = LEVELS[gameState.level] || LEVELS[5];
