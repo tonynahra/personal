@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SumPuzzle - Brain Training V9</title>
+    <title>SumPuzzle - Brain Training V10</title>
     
     <meta name="description" content="Exercise your brain with SumPuzzle. Improve cognitive function and arithmetic speed.">
     <meta property="og:title" content="SumPuzzle - Brain Training">
@@ -23,7 +23,9 @@
         }
         .game-container {
             background: white; padding: 2rem; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            /* Main Game Width */
+            width: 90%; max-width: 450px;
             display: flex; flex-direction: column; gap: 1.5rem; position: relative;
         }
 
@@ -78,16 +80,18 @@
             backdrop-filter: blur(4px);
         }
 
-        /* Base Modal (Auto height for Intro/Alerts) */
+        /* Base Modal */
         .modal { 
-            background: white; border-radius: 15px; width: 85%; max-width: 400px;
+            background: white; border-radius: 15px; 
+            /* Maximized Width Logic: Slightly smaller than game container (90%/450px) */
+            width: 88%; max-width: 430px; 
             padding: 2rem; position: relative; animation: slideUp 0.3s ease;
             max-height: 90vh; overflow-y: auto;
         }
 
         /* Fixed Menu Modal (Taller Height) */
         .modal.menu-modal {
-            height: 680px; /* INCREASED HEIGHT */
+            height: 680px; 
             max-height: 95vh;
             display: flex; flex-direction: column;
             padding: 0; 
@@ -319,7 +323,7 @@
             stats: { 
                 highScore: 0, highScoreDate: '-', 
                 maxLevel: 1, longestSession: 0,
-                historyScores: [] // Array of {score: int, date: str}
+                historyScores: [] 
             },
             level: 1,
             timeLeft: 0, maxTime: 60, timerInterval: null,
@@ -366,7 +370,7 @@
             const saved = localStorage.getItem('sumPuzzle_stats_v8');
             if (saved) {
                 const data = JSON.parse(saved);
-                gameState.stats = { ...gameState.stats, ...data }; // Merge default with saved
+                gameState.stats = { ...gameState.stats, ...data }; 
             }
             updateStatsUI();
         }
@@ -382,7 +386,6 @@
                 gameState.stats.highScore = newScore;
                 gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
                 
-                // Add to history if it's a new high score
                 gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate });
                 if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
             }
@@ -429,7 +432,6 @@
         }
 
         function generatePuzzle(config, attempts = 0) {
-            // Adjust distinct requirement if too hard
             if(attempts > 50) config.distinct = Math.max(3, config.distinct - 1);
             
             const min = Math.pow(10, config.digits - 1);
@@ -520,7 +522,7 @@
                 clearInterval(gameState.timerInterval);
                 gameState.isTransitioning = true;
                 updateStats(gameState.score);
-                if (gameState.level < 5) gameState.level++; // Cap at 5
+                if (gameState.level < 5) gameState.level++; 
                 el.msg.innerText = "Level Complete!"; el.msg.style.color = "var(--correct)";
                 setTimeout(startLevel, 2000);
             }
@@ -617,7 +619,6 @@
             } else {
                 document.getElementById('subTabHistory').classList.add('active');
                 document.getElementById('historyChart').style.display = 'block';
-                // Extract just scores for the chart
                 const historyVals = gameState.stats.historyScores.map(x => x.score);
                 drawChart(el.historyChart, historyVals, '#00CEC9');
             }
