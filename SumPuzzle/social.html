@@ -98,20 +98,10 @@
             display: flex; flex-direction: column; padding: 0; 
         }
 
-        /* COMPACTED HEADER PADDING */
-        .menu-header { 
-            padding: 0.8rem 1rem 0 1rem; /* Reduced top/side padding */
-            flex-shrink: 0; 
-        }
-        
-        /* COMPACTED BODY PADDING */
-        .menu-body { 
-            padding: 0 1rem 1rem 1rem; /* Removed top padding to pull content up */
-            flex: 1; 
-            overflow-y: auto; 
-        }
+        .menu-header { padding: 0.8rem 1rem 0 1rem; flex-shrink: 0; }
+        .menu-body { padding: 0 1rem 1rem 1rem; flex: 1; overflow-y: auto; }
 
-        .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 0.5rem; } /* Reduced margin */
+        .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 0.5rem; }
         .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         .tab-content { display: none; }
@@ -123,19 +113,12 @@
         .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
         .stat-lbl { font-size: 0.7rem; color: #636e72; text-transform: uppercase; }
 
-        /* Clean Tables */
+        /* Tables */
         .rules-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 15px; }
         .rules-table th { background: #f0f3f5; color: #636e72; padding: 6px 8px; text-align: left; font-size: 0.8rem; }
         .rules-table td { padding: 6px 8px; border-bottom: 1px solid #dfe6e9; color: var(--dark); }
         .rules-table tr:last-child td { border-bottom: none; }
         .tag { padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; color: white; display: inline-block; }
-
-        /* Scoring Box */
-        .scoring-box { background: var(--bg); border-radius: 10px; padding: 10px 15px; margin-top: 5px; }
-        .score-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 3px; }
-        .score-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-        .plus { color: var(--correct); font-weight: bold; }
-        .minus { color: var(--wrong); font-weight: bold; }
 
         .lb-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         .lb-table th { text-align: left; color: #b2bec3; padding-bottom: 5px; font-size: 0.8rem; }
@@ -143,11 +126,22 @@
         .lb-rank { font-weight: bold; color: var(--primary); width: 30px; }
         .lb-score { font-weight: bold; text-align: right; }
 
+        /* Scoring */
+        .scoring-box { background: var(--bg); border-radius: 10px; padding: 10px 15px; margin-top: 5px; }
+        .score-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 3px; }
+        .score-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .plus { color: var(--correct); font-weight: bold; }
+        .minus { color: var(--wrong); font-weight: bold; }
+
         .checkbox-container { display: flex; align-items: center; margin-top: 15px; font-size: 0.9rem; color: #636e72; }
         .checkbox-container input { margin-right: 10px; transform: scale(1.2); }
-        canvas { width: 100%; height: 140px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px; }
         
-        h3 { margin-bottom: 0.5rem; margin-top: 0.5rem; font-size: 1.1rem; }
+        /* Chart & No Data Message */
+        canvas { width: 100%; height: 140px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px; }
+        .no-data {
+            width: 100%; height: 140px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
+            display: flex; justify-content: center; align-items: center; color: #b2bec3; font-weight: bold; font-size: 0.9rem;
+        }
 
         .toast {
             position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
@@ -155,9 +149,13 @@
             font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200;
         }
         .toast.show { opacity: 1; }
+        
         .sub-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; background: var(--bg); padding: 5px; border-radius: 8px; }
         .sub-tab { padding: 5px 15px; cursor: pointer; font-size: 0.85rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; }
         .sub-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* Intro Buttons Grid */
+        .intro-actions { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
 
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
@@ -206,15 +204,16 @@
         <div class="modal">
             <div style="font-size:3rem; text-align:center; margin-bottom:10px;">🧠</div>
             <h2 style="margin-top:0; text-align:center;">Daily Brain Training</h2>
-            <p style="color:#636e72; line-height: 1.5; font-size: 1rem;">
-                Welcome to <strong>SumPuzzle</strong>. Every day, a new set of puzzles is generated. Everyone plays the exact same levels.
+            <p style="color:#636e72; line-height: 1.5; font-size: 1rem; text-align: center;">
+                Every day, a new set of puzzles is generated. Everyone plays the exact same levels.
             </p>
-            <div style="background:var(--bg); padding:15px; border-radius:8px; margin: 15px 0;">
-                <h4 style="margin:0 0 5px 0; color:var(--dark);">Goal:</h4>
-                <p style="margin:0; font-size:0.9rem; color:#636e72;">Solve the arithmetic equations to advance. Compete for the highest daily score.</p>
+            
+            <div class="intro-actions">
+                <button class="num-btn" style="background:var(--primary); color:white; border:none;" onclick="closeIntro()">▶ Start Puzzle</button>
+                <button class="num-btn" style="background:white; color:var(--dark); border:2px solid var(--light);" onclick="viewLeaderboardFromIntro()">🏆 Global Leaderboard</button>
             </div>
-            <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeIntro()">Start Today's Puzzle</button>
-            <div class="checkbox-container">
+
+            <div class="checkbox-container" style="justify-content: center;">
                 <input type="checkbox" id="dontShowAgain">
                 <label for="dontShowAgain">Don't show this again</label>
             </div>
@@ -252,8 +251,13 @@
                         <div class="sub-tab active" id="subTabSession" onclick="togglePerfChart('session')">Session</div>
                         <div class="sub-tab" id="subTabHistory" onclick="togglePerfChart('history')">History</div>
                     </div>
+                    
+                    <div id="msgSession" class="no-data" style="display:none;">Play a game to see stats!</div>
                     <canvas id="sessionChart"></canvas>
+                    
+                    <div id="msgHistory" class="no-data" style="display:none;">No high scores saved yet.</div>
                     <canvas id="historyChart" style="display:none;"></canvas>
+
                     <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="shareScore()">📤 Share to Socials</button>
                     <button class="num-btn" style="width:100%; margin-top:10px; background:var(--correct); color:white; border:none;" onclick="openSubmitModal()">🌍 Global Leaderboard</button>
                     <button class="num-btn" style="width:100%; margin-top:10px; background:var(--light); color:var(--dark); border:none;" onclick="resumeGame()">Resume Game</button>
@@ -269,7 +273,6 @@
                 
                 <div id="rules" class="tab-content">
                     <h3 style="margin-top:0;">Level Guide</h3>
-                    
                     <table class="rules-table">
                         <thead>
                             <tr>
@@ -280,32 +283,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td> <td>2</td> <td>90s</td> 
-                                <td><span class="tag" style="background:#00b894;">Easy</span></td>
-                            </tr>
-                            <tr>
-                                <td>2</td> <td>3</td> <td>120s</td> 
-                                <td><span class="tag" style="background:#00cec9;">Med</span></td>
-                            </tr>
-                            <tr>
-                                <td>3</td> <td>4</td> <td>180s</td> 
-                                <td><span class="tag" style="background:#0984e3;">Hard</span></td>
-                            </tr>
-                            <tr>
-                                <td>4</td> <td>5</td> <td>240s</td> 
-                                <td><span class="tag" style="background:#6c5ce7;">Expert</span></td>
-                            </tr>
-                            <tr>
-                                <td>5</td> <td>6</td> <td>300s</td> 
-                                <td><span class="tag" style="background:#d63031;">Master</span></td>
-                            </tr>
+                            <tr><td>1</td> <td>2</td> <td>90s</td> <td><span class="tag" style="background:#00b894;">Easy</span></td></tr>
+                            <tr><td>2</td> <td>3</td> <td>120s</td> <td><span class="tag" style="background:#00cec9;">Med</span></td></tr>
+                            <tr><td>3</td> <td>4</td> <td>180s</td> <td><span class="tag" style="background:#0984e3;">Hard</span></td></tr>
+                            <tr><td>4</td> <td>5</td> <td>240s</td> <td><span class="tag" style="background:#6c5ce7;">Expert</span></td></tr>
+                            <tr><td>5</td> <td>6</td> <td>300s</td> <td><span class="tag" style="background:#d63031;">Master</span></td></tr>
                         </tbody>
                     </table>
 
                     <h3 style="margin-bottom:5px;">Scoring Logic</h3>
-                    <p style="color:#636e72; font-size:0.9rem; margin-top:0;">Letters represent digits 0-9. No duplicates.</p>
-
                     <div class="scoring-box">
                         <div class="score-row"><span>Correct Answer</span> <span class="plus">+100 pts</span></div>
                         <div class="score-row"><span>Speed Bonus</span> <span class="plus">+Time Left</span></div>
@@ -320,11 +306,10 @@
     </div>
 
     <script>
-        // --- SEEDED RNG LOGIC (For Daily Puzzle) ---
+        // --- SEEDED RNG LOGIC ---
         let currentSeed = 1;
         let dailyGameId = 1;
         
-        // Linear Congruential Generator
         function seededRandom() {
             const a = 1664525; const c = 1013904223; const m = 4294967296;
             currentSeed = (a * currentSeed + c) % m;
@@ -345,7 +330,7 @@
             level: 1, timeLeft: 0, maxTime: 60, timerInterval: null,
             puzzle: null, letterMap: {}, reverseMap: {}, guessedLetters: {}, selectedChar: null,
             sessionHistory: [0], isPaused: true, isTransitioning: false, sessionStartTime: Date.now(),
-            dailySeedBase: 0 // Stores the base seed from server
+            dailySeedBase: 0
         };
 
         const el = {
@@ -358,6 +343,8 @@
             msg: document.getElementById('messageArea'),
             sessionChart: document.getElementById('sessionChart'),
             historyChart: document.getElementById('historyChart'),
+            msgSession: document.getElementById('msgSession'),
+            msgHistory: document.getElementById('msgHistory'),
             toast: document.getElementById('toast'),
             statMaxLvl: document.getElementById('statMaxLvl'),
             statLongestTime: document.getElementById('statLongestTime'),
@@ -366,22 +353,13 @@
 
         function init() {
             setupNumpad(); setupTabs(); setupKeyboard(); loadData();
-            
-            // Fetch Daily Seed
-            fetch('daily.php')
-                .then(res => res.json())
-                .then(data => {
-                    gameState.dailySeedBase = data.seed;
-                    dailyGameId = data.gameId;
-                    checkIntro();
-                })
-                .catch(err => {
-                    console.warn("Offline mode or Server Error");
-                    const now = new Date();
-                    gameState.dailySeedBase = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
-                    dailyGameId = 0;
-                    checkIntro();
-                });
+            fetch('daily.php').then(res => res.json()).then(data => {
+                gameState.dailySeedBase = data.seed; dailyGameId = data.gameId; checkIntro();
+            }).catch(err => {
+                const now = new Date();
+                gameState.dailySeedBase = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
+                dailyGameId = 0; checkIntro();
+            });
                 
             document.getElementById('rulesBtn').onclick = () => openMenu('rules');
             document.getElementById('statsBtn').onclick = () => openMenu('status');
@@ -396,57 +374,40 @@
             else { el.modals.intro.style.display = 'flex'; }
         }
 
+        function viewLeaderboardFromIntro() {
+            document.getElementById('introModal').style.display = 'none';
+            openMenu('leaderboard');
+        }
+
         // --- Core Game ---
         function startLevel() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
             updateStats(gameState.score); 
-            // UPDATED HEADER FORMAT
             el.level.innerText = `Daily #${dailyGameId} | Level ${gameState.level}`;
-
-            // Reset Seed based on Level
             currentSeed = gameState.dailySeedBase + (gameState.level * 10000);
-
             const config = LEVELS[gameState.level] || LEVELS[5];
-            gameState.maxTime = config.time;
-            gameState.timeLeft = config.time;
-            gameState.guessedLetters = {};
-            gameState.selectedChar = null;
-            el.msg.innerText = "Select a letter above, then guess a number.";
-            el.msg.style.color = "#636e72";
-
-            generatePuzzle(config);
-            renderBoard();
-            startTimer();
-            updateUI();
+            gameState.maxTime = config.time; gameState.timeLeft = config.time;
+            gameState.guessedLetters = {}; gameState.selectedChar = null;
+            el.msg.innerText = "Select a letter above, then guess a number."; el.msg.style.color = "#636e72";
+            generatePuzzle(config); renderBoard(); startTimer(); updateUI();
         }
 
         function generatePuzzle(config, attempts = 0) {
             if(attempts > 50) config.distinct = Math.max(3, config.distinct - 1);
-            const min = Math.pow(10, config.digits - 1);
-            const max = Math.pow(10, config.digits) - 1;
-            
+            const min = Math.pow(10, config.digits - 1); const max = Math.pow(10, config.digits) - 1;
             let n1 = Math.floor(seededRandom() * (max - min) + min);
             let n2 = Math.floor(seededRandom() * (max - min) + min);
             let sum = n1 + n2;
             const uniqueDigits = [...new Set(`${n1}${n2}${sum}`.split(''))];
-
-            if ((uniqueDigits.length < config.distinct || uniqueDigits.length > 10) && attempts <= 50) {
-                return generatePuzzle(config, attempts + 1);
-            }
-
+            if ((uniqueDigits.length < config.distinct || uniqueDigits.length > 10) && attempts <= 50) return generatePuzzle(config, attempts + 1);
             const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ".split('').sort(() => 0.5 - seededRandom());
             gameState.letterMap = {}; gameState.reverseMap = {};
             uniqueDigits.forEach((digit, index) => {
                 gameState.letterMap[letters[index]] = parseInt(digit);
                 gameState.reverseMap[digit] = letters[index];
             });
-
-            gameState.puzzle = {
-                row1: n1.toString().split('').map(d => gameState.reverseMap[d]),
-                row2: n2.toString().split('').map(d => gameState.reverseMap[d]),
-                sum: sum.toString().split('').map(d => gameState.reverseMap[d])
-            };
+            gameState.puzzle = { row1: n1.toString().split('').map(d=>gameState.reverseMap[d]), row2: n2.toString().split('').map(d=>gameState.reverseMap[d]), sum: sum.toString().split('').map(d=>gameState.reverseMap[d]) };
         }
 
         function renderBoard() {
@@ -482,7 +443,6 @@
             if (gameState.isPaused) return;
             if (!gameState.selectedChar) { showToast("Select a letter first!"); return; }
             if(btn) { btn.style.transform = "scale(0.9)"; setTimeout(()=> btn.style.transform = "scale(1)", 100); }
-
             if (digit === gameState.letterMap[gameState.selectedChar]) {
                 gameState.guessedLetters[gameState.selectedChar] = true;
                 const timeFactor = gameState.timeLeft / gameState.maxTime;
@@ -498,117 +458,59 @@
             }
         }
 
-        function revealLetter(char, digit) {
-            document.querySelectorAll(`.char-box[data-char="${char}"]`).forEach(b => {
-                b.innerText = digit; b.classList.remove('selected'); b.classList.add('solved');
-            });
-        }
-
+        function revealLetter(char, digit) { document.querySelectorAll(`.char-box[data-char="${char}"]`).forEach(b => { b.innerText = digit; b.classList.remove('selected'); b.classList.add('solved'); }); }
         function checkWin() {
             const needed = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
             if (needed.every(c => gameState.guessedLetters[c])) {
-                clearInterval(gameState.timerInterval);
-                gameState.isTransitioning = true;
-                updateStats(gameState.score);
-                if (gameState.level < 5) gameState.level++; 
-                el.msg.innerText = "Level Complete!"; el.msg.style.color = "var(--correct)";
+                clearInterval(gameState.timerInterval); gameState.isTransitioning = true; updateStats(gameState.score);
+                if (gameState.level < 5) gameState.level++; el.msg.innerText = "Level Complete!"; el.msg.style.color = "var(--correct)";
                 setTimeout(startLevel, 2000);
             }
         }
-
-        function failLevel() {
-            clearInterval(gameState.timerInterval);
-            gameState.isTransitioning = true;
-            alert("Time's Up! Difficulty lowered.");
-            if (gameState.level > 1) gameState.level--;
-            startLevel();
-        }
-
-        function addScore(amount) {
-            gameState.score = Math.max(0, gameState.score + amount);
-            gameState.sessionHistory.push(gameState.score);
-            updateStats(gameState.score);
-            updateUI();
-        }
-
+        function failLevel() { clearInterval(gameState.timerInterval); gameState.isTransitioning = true; alert("Time's Up! Difficulty lowered."); if (gameState.level > 1) gameState.level--; startLevel(); }
+        function addScore(amount) { gameState.score = Math.max(0, gameState.score + amount); gameState.sessionHistory.push(gameState.score); updateStats(gameState.score); updateUI(); }
         function skipLevel() { if(!gameState.isPaused && checkCost(50)) { addScore(-50); startLevel(); } }
         function useHint() {
             if(gameState.isPaused || !checkCost(50)) return;
             const unsolved = [...new Set([...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum])].filter(c => !gameState.guessedLetters[c]);
             if(unsolved.length === 0) return;
-            addScore(-50);
-            const target = unsolved[0];
-            gameState.guessedLetters[target] = true;
-            revealLetter(target, gameState.letterMap[target]);
-            document.querySelectorAll(`.char-box[data-char="${target}"]`).forEach(b => b.classList.add('hinted'));
-            checkWin();
+            addScore(-50); const target = unsolved[0]; gameState.guessedLetters[target] = true; revealLetter(target, gameState.letterMap[target]); document.querySelectorAll(`.char-box[data-char="${target}"]`).forEach(b => b.classList.add('hinted')); checkWin();
         }
         function checkCost(cost) { if(gameState.score < cost) { showToast(`Need ${cost} pts!`); return false; } return true; }
-
         function startTimer() {
             gameState.timerInterval = setInterval(() => {
                 if (gameState.isPaused) return;
-                gameState.timeLeft--;
-                const pct = Math.max(0, gameState.timeLeft / gameState.maxTime);
-                el.timerPath.style.strokeDashoffset = 126 - (126 * pct);
-                el.timerPath.style.stroke = pct < 0.25 ? "var(--wrong)" : "var(--accent)";
+                gameState.timeLeft--; const pct = Math.max(0, gameState.timeLeft / gameState.maxTime);
+                el.timerPath.style.strokeDashoffset = 126 - (126 * pct); el.timerPath.style.stroke = pct < 0.25 ? "var(--wrong)" : "var(--accent)";
                 if (gameState.timeLeft <= 0) failLevel();
             }, 1000);
         }
-
-        function updateUI() {
-            el.score.innerText = gameState.score;
-        }
-
-        // --- Stats & Persistence ---
-        function loadData() {
-            const saved = localStorage.getItem('sumPuzzle_stats_v11');
-            if (saved) gameState.stats = { ...gameState.stats, ...JSON.parse(saved) };
-            updateStatsUI();
-        }
+        function updateUI() { el.score.innerText = gameState.score; }
+        function loadData() { const saved = localStorage.getItem('sumPuzzle_stats_v11'); if (saved) gameState.stats = { ...gameState.stats, ...JSON.parse(saved) }; updateStatsUI(); }
         function saveData() { localStorage.setItem('sumPuzzle_stats_v11', JSON.stringify(gameState.stats)); }
-        
         function updateStats(newScore) {
             if (newScore > gameState.stats.highScore) {
-                const now = new Date();
-                gameState.stats.highScore = newScore;
-                gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
+                const now = new Date(); gameState.stats.highScore = newScore; gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
                 gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate });
                 if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
             }
             if (gameState.level > gameState.stats.maxLevel) gameState.stats.maxLevel = gameState.level;
-            saveData();
-            updateStatsUI();
+            saveData(); updateStatsUI();
         }
-        function updateSessionTime() {
-            const sec = (Date.now() - gameState.sessionStartTime) / 1000;
-            if (sec > gameState.stats.longestSession) { gameState.stats.longestSession = sec; saveData(); updateStatsUI(); }
-        }
-        function updateStatsUI() {
-            el.highScore.innerText = `Best: ${gameState.stats.highScore}`;
-            el.statMaxLvl.innerText = gameState.stats.maxLevel;
-            el.statLongestTime.innerText = Math.floor(gameState.stats.longestSession / 60) + "m";
-        }
-
-        // --- Social & PHP ---
+        function updateSessionTime() { const sec = (Date.now() - gameState.sessionStartTime) / 1000; if (sec > gameState.stats.longestSession) { gameState.stats.longestSession = sec; saveData(); updateStatsUI(); } }
+        function updateStatsUI() { el.highScore.innerText = `Best: ${gameState.stats.highScore}`; el.statMaxLvl.innerText = gameState.stats.maxLevel; el.statLongestTime.innerText = Math.floor(gameState.stats.longestSession / 60) + "m"; }
         async function shareScore() {
             let squares = gameState.score > 1000 ? "🟩🟩🟩" : (gameState.score > 500 ? "🟩🟩🟨" : "🟩🟨⬜");
             const text = `SumPuzzle Daily #${dailyGameId} 🧠\nScore: ${gameState.score}\n${squares}\n\nPlay: https://mediamaze.com/SP/`;
-            if (navigator.share) { try { await navigator.share({ title: 'SumPuzzle', text: text }); } catch(e){} } 
-            else { navigator.clipboard.writeText(text); showToast("Result copied!"); }
+            if (navigator.share) { try { await navigator.share({ title: 'SumPuzzle', text: text }); } catch(e){} } else { navigator.clipboard.writeText(text); showToast("Result copied!"); }
         }
-
         const API_URL = 'score_api.php'; 
         function openSubmitModal() { el.modals.submit.style.display = 'flex'; }
         function submitScoreToPHP() {
-            const name = document.getElementById('playerName').value.trim();
-            if(!name) { alert("Enter name"); return; }
-            const payload = new URLSearchParams();
-            payload.append('action', 'submit'); payload.append('name', name);
-            payload.append('score', gameState.score); payload.append('level', gameState.stats.maxLevel);
+            const name = document.getElementById('playerName').value.trim(); if(!name) { alert("Enter name"); return; }
+            const payload = new URLSearchParams(); payload.append('action', 'submit'); payload.append('name', name); payload.append('score', gameState.score); payload.append('level', gameState.stats.maxLevel);
             fetch(API_URL, { method: 'POST', body: payload }).then(res=>res.json()).then(data=>{
-                if(data.status==='success') { el.modals.submit.style.display='none'; showToast("Submitted!"); openMenu('leaderboard'); }
-                else alert(data.message);
+                if(data.status==='success') { el.modals.submit.style.display='none'; showToast("Submitted!"); openMenu('leaderboard'); } else alert(data.message);
             });
         }
         function fetchLeaderboard() {
@@ -616,15 +518,10 @@
             fetch(API_URL + '?action=get').then(res=>res.json()).then(data=>{
                 document.getElementById('lbLoading').style.display = 'none';
                 let html = '<tr><th>#</th><th>Name</th><th>Lvl</th><th style="text-align:right">Score</th></tr>';
-                data.forEach((row,i) => {
-                    let icon = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1));
-                    html += `<tr><td class="lb-rank">${icon}</td><td>${row.name}</td><td>${row.level}</td><td class="lb-score">${row.score}</td></tr>`;
-                });
+                data.forEach((row,i) => { let icon = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1)); html += `<tr><td class="lb-rank">${icon}</td><td>${row.name}</td><td>${row.level}</td><td class="lb-score">${row.score}</td></tr>`; });
                 lbDiv.innerHTML = html;
             });
         }
-
-        // --- Utils ---
         function showToast(text) { el.toast.innerText=text; el.toast.classList.add('show'); setTimeout(()=>el.toast.classList.remove('show'),2000); }
         function setupNumpad() { for(let i=0; i<=9; i++) { const b=document.createElement('button'); b.className='num-btn'; b.innerText=i; b.onclick=()=>handleInput(i,b); el.numpad.appendChild(b); } }
         function setupKeyboard() { document.addEventListener('keydown', e => { if(e.key>='0'&&e.key<='9') { const b=[...document.querySelectorAll('.num-btn')].find(x=>x.innerText===e.key); handleInput(parseInt(e.key),b); } }); }
@@ -636,18 +533,33 @@
         function togglePerfChart(type) {
             document.getElementById('subTabSession').classList.remove('active'); document.getElementById('subTabHistory').classList.remove('active');
             document.getElementById('sessionChart').style.display='none'; document.getElementById('historyChart').style.display='none';
-            if(type==='session') { document.getElementById('subTabSession').classList.add('active'); document.getElementById('sessionChart').style.display='block'; drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7'); }
-            else { document.getElementById('subTabHistory').classList.add('active'); document.getElementById('historyChart').style.display='block'; drawChart(el.historyChart, gameState.stats.historyScores.map(x=>x.score), '#00CEC9'); }
+            document.getElementById('msgSession').style.display='none'; document.getElementById('msgHistory').style.display='none';
+            
+            if(type==='session') { 
+                document.getElementById('subTabSession').classList.add('active');
+                if(gameState.sessionHistory.length <= 1 && gameState.sessionHistory[0] === 0) {
+                     document.getElementById('msgSession').style.display='flex';
+                } else {
+                     document.getElementById('sessionChart').style.display='block'; 
+                     drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7'); 
+                }
+            } else { 
+                document.getElementById('subTabHistory').classList.add('active'); 
+                if(gameState.stats.historyScores.length === 0) {
+                     document.getElementById('msgHistory').style.display='flex';
+                } else {
+                     document.getElementById('historyChart').style.display='block'; 
+                     drawChart(el.historyChart, gameState.stats.historyScores.map(x=>x.score), '#00CEC9'); 
+                }
+            }
         }
         function drawChart(c,data,color) {
             const ctx=c.getContext('2d'); c.width=c.clientWidth; c.height=c.clientHeight; ctx.clearRect(0,0,c.width,c.height);
-            if(data.length<1) { ctx.fillStyle="#b2bec3"; ctx.font="12px sans-serif"; ctx.textAlign="center"; ctx.fillText("No data yet", c.width/2,c.height/2); return; }
             const max=Math.max(...data,100), step=c.width/Math.max(data.length-1,1);
             ctx.beginPath(); data.forEach((p,i)=>{ const x=i*step, y=c.height-((p/max)*(c.height*0.7))-10; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
             ctx.strokeStyle=color; ctx.lineWidth=3; ctx.stroke(); ctx.lineTo(c.width,c.height); ctx.lineTo(0,c.height);
             const g=ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0,color.replace(')',',0.2)').replace('#','rgba(')); g.addColorStop(1,'white'); ctx.fillStyle=g; ctx.fill();
         }
-
         init();
     </script>
 </body>
