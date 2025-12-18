@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SumPuzzle - Cryptarithmetic Math Game</title>
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #00CEC9;
+            --accent: #FD79A8;
+            --dark: #2D3436;
+            --light: #DFE6E9;
+            --bg: #F0F3F5;
+            --correct: #00B894;
+            --wrong: #D63031;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark);
+            overflow: hidden;
+        }
+
+        /* --- Layout & Containers --- */
+        .game-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* --- Header: Stats & Timer --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .score-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: #636e72;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .level-badge {
+            background: var(--light);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Circular Timer */
+        .timer-container {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+        .timer-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+        .timer-circle {
+            fill: none;
+            stroke: var(--light);
+            stroke-width: 5;
+        }
+        .timer-path {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 5;
+            stroke-dasharray: 126; /* 2 * PI * r (approx 20) */
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        /* --- The Puzzle Board --- */
+        .board {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 0.2rem;
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .operator {
+            position: absolute;
+            left: 10px;
+            bottom: 30%;
+            color: var(--primary);
+        }
+
+        .line {
+            width: 100%;
+            height: 4px;
+            background-color: var(--dark);
+            margin: 5px 0;
+            border-radius: 2px;
+        }
+
+        .digit-box {
+            display: inline-block;
+            width: 40px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .digit-box.solved {
+            color: var(--correct);
+            transform: scale(1.1);
+        }
+        
+        .digit-box.hinted {
+            color: var(--secondary);
+        }
+
+        /* --- Controls --- */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .num-btn {
+            background: white;
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            color: var(--dark);
+        }
+
+        .num-btn:active {
+            transform: scale(0.95);
+        }
+
+        .num-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #636e72;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+        }
+        
+        .hint-btn { color: var(--accent); }
+
+        /* --- Modals & Overlays --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 400px;
+            animation: slideUp 0.3s ease;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--light);
+            margin-bottom: 1rem;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #b2bec3;
+            border-bottom: 3px solid transparent;
+        }
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .rules-list li { margin-bottom: 8px; font-size: 0.95rem; }
+        
+        /* Stats Chart */
+        canvas {
+            width: 100%;
+            height: 150px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.3s; border-color: var(--wrong); color: var(--wrong); }
+
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="header">
+            <div class="score-box">
+                <span class="score-label">Score</span>
+                <span class="score-value" id="scoreDisplay">0</span>
+            </div>
+            
+            <div class="level-badge" id="levelDisplay">Level 1 (Easy)</div>
+
+            <div class="timer-container">
+                <svg class="timer-svg">
+                    <circle class="timer-circle" cx="25" cy="25" r="20"></circle>
+                    <path class="timer-path" id="timerPath" d="M 25, 25 m 0, -20 a 20,20 0 1,0 0,40 a 20,20 0 1,0 0,-40"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="board" id="gameBoard">
+            <div class="operator">+</div>
+            <div id="row1">AB</div>
+            <div id="row2">CD</div>
+            <div class="line"></div>
+            <div id="row3">EF</div>
+        </div>
+
+        <div style="text-align: center; color: #636e72; font-size: 0.9rem; min-height: 1.2rem;" id="messageArea">
+            Guess the digit for <span id="targetLetter" style="font-weight:bold; color:var(--primary)">A</span>
+        </div>
+
+        <div class="controls" id="numpad">
+            </div>
+
+        <div class="action-bar">
+            <button class="icon-btn" id="rulesBtn">
+                <span>?</span> Rules
+            </button>
+            <button class="icon-btn" id="statsBtn">
+                <span>📊</span> Pause
+            </button>
+            <button class="icon-btn hint-btn" id="hintBtn">
+                <span>💡</span> Hint (-50)
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal">
+            <div class="tabs">
+                <div class="tab active" data-tab="rules">Rules</div>
+                <div class="tab" data-tab="score">Score</div>
+                <div class="tab" data-tab="about">About</div>
+            </div>
+            
+            <div id="rules" class="tab-content active">
+                <h3>How to Play</h3>
+                <ul class="rules-list">
+                    <li>This is an addition puzzle: Number 1 + Number 2 = Result.</li>
+                    <li>Digits (0-9) are replaced by letters.</li>
+                    <li>Each letter represents a <strong>unique</strong> digit.</li>
+                    <li>Click the numbers to guess the value of the highlighted letter.</li>
+                    <li>Solve it before the timer runs out!</li>
+                </ul>
+                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeModals()">Got it!</button>
+            </div>
+
+            <div id="score" class="tab-content">
+                <h3>Scoring System</h3>
+                <ul class="rules-list">
+                    <li><strong>Correct Guess:</strong> +100 Base Points.</li>
+                    <li><strong>Time Bonus:</strong> The faster you solve, the higher the multiplier.</li>
+                    <li><strong>Penalty:</strong> Wrong guess reduces score.</li>
+                    <li><strong>Hint:</strong> Reveals one letter but costs 50 points.</li>
+                    <li><strong>Failure:</strong> Giving up or time out lowers difficulty.</li>
+                </ul>
+                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeModals()">Close</button>
+            </div>
+
+            <div id="about" class="tab-content">
+                <h3>SumPuzzle v1.0</h3>
+                <p>Created to challenge your logical arithmetic skills.</p>
+                <p>For more projects, visit:</p>
+                <a href="https://tonynahra.github.io" target="_blank" style="color:var(--primary); font-weight:bold;">tonynahra.github.io</a>
+                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="closeModals()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="pauseModal">
+        <div class="modal">
+            <h3 style="text-align: center;">Game Paused</h3>
+            <p style="text-align: center; color:#636e72;">Score Progress</p>
+            <canvas id="scoreChart"></canvas>
+            <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--correct); color:white; border:none;" id="resumeBtn">Resume Game</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game State ---
+        const gameState = {
+            score: 0,
+            level: 1, // 1=Easy, 2=Med, 3=Hard
+            timeLeft: 0,
+            maxTime: 60,
+            timerInterval: null,
+            puzzle: null,
+            letterMap: {}, // Maps Letter -> Digit (Solution)
+            reverseMap: {}, // Maps Digit -> Letter
+            guessedLetters: {}, // Maps Letter -> boolean (true if solved)
+            targetLetter: '', // The letter currently being guessed (optional logic, or allow user to pick)
+            scoreHistory: [0],
+            isPaused: false
+        };
+
+        // --- Config ---
+        const LEVELS = {
+            1: { digits: 2, carryChance: 0.3, distinct: 4, time: 60 },
+            2: { digits: 3, carryChance: 0.6, distinct: 6, time: 90 },
+            3: { digits: 4, carryChance: 0.9, distinct: 8, time: 120 }
+        };
+
+        // --- DOM Elements ---
+        const el = {
+            score: document.getElementById('scoreDisplay'),
+            level: document.getElementById('levelDisplay'),
+            board: document.getElementById('gameBoard'),
+            numpad: document.getElementById('numpad'),
+            timerPath: document.getElementById('timerPath'),
+            msg: document.getElementById('messageArea'),
+            targetSpan: document.getElementById('targetLetter'),
+            modals: {
+                rules: document.getElementById('rulesModal'),
+                pause: document.getElementById('pauseModal')
+            },
+            chart: document.getElementById('scoreChart')
+        };
+
+        // --- Initialization ---
+        function init() {
+            setupNumpad();
+            setupTabs();
+            startLevel();
+            
+            // Event Listeners
+            document.getElementById('rulesBtn').onclick = () => showModal('rules');
+            document.getElementById('statsBtn').onclick = pauseGame;
+            document.getElementById('resumeBtn').onclick = resumeGame;
+            document.getElementById('hintBtn').onclick = useHint;
+        }
+
+        function setupNumpad() {
+            el.numpad.innerHTML = '';
+            for(let i=0; i<=9; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'num-btn';
+                btn.innerText = i;
+                btn.onclick = () => handleGuess(i, btn);
+                el.numpad.appendChild(btn);
+            }
+        }
+
+        // --- Game Logic ---
+
+        function startLevel() {
+            const config = LEVELS[gameState.level] || LEVELS[3];
+            gameState.maxTime = config.time;
+            gameState.timeLeft = config.time;
+            gameState.guessedLetters = {};
+            
+            generatePuzzle(config);
+            renderBoard();
+            pickNextTarget();
+            startTimer();
+            updateUI();
+        }
+
+        function generatePuzzle(config) {
+            // 1. Generate Numbers
+            const min = Math.pow(10, config.digits - 1);
+            const max = Math.pow(10, config.digits) - 1;
+            
+            let n1 = Math.floor(Math.random() * (max - min) + min);
+            let n2 = Math.floor(Math.random() * (max - min) + min);
+            let sum = n1 + n2;
+
+            // 2. Extract unique digits
+            const allStr = `${n1}${n2}${sum}`;
+            const uniqueDigits = [...new Set(allStr.split(''))];
+            
+            // If too few unique digits for difficulty, try again (simple recursion)
+            if (uniqueDigits.length < config.distinct - 2 && Math.random() > 0.1) {
+                return generatePuzzle(config);
+            }
+
+            // 3. Map Digits to Letters
+            const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ".split('').sort(() => 0.5 - Math.random());
+            gameState.letterMap = {};
+            gameState.reverseMap = {};
+            
+            uniqueDigits.forEach((digit, index) => {
+                const char = letters[index];
+                gameState.letterMap[char] = parseInt(digit);
+                gameState.reverseMap[digit] = char;
+            });
+
+            // 4. Store Puzzle Structure
+            gameState.puzzle = {
+                row1: n1.toString().split('').map(d => gameState.reverseMap[d]),
+                row2: n2.toString().split('').map(d => gameState.reverseMap[d]),
+                sum: sum.toString().split('').map(d => gameState.reverseMap[d])
+            };
+        }
+
+        function renderBoard() {
+            const row1Html = gameState.puzzle.row1.map(char => `<span class="digit-box" data-char="${char}">${char}</span>`).join('');
+            const row2Html = gameState.puzzle.row2.map(char => `<span class="digit-box" data-char="${char}">${char}</span>`).join('');
+            const sumHtml = gameState.puzzle.sum.map(char => `<span class="digit-box" data-char="${char}">${char}</span>`).join('');
+
+            el.board.innerHTML = `
+                <div class="operator">+</div>
+                <div>${row1Html}</div>
+                <div>${row2Html}</div>
+                <div class="line"></div>
+                <div>${sumHtml}</div>
+            `;
+        }
+
+        function pickNextTarget() {
+            // Find a letter that hasn't been guessed yet
+            const allChars = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
+            const remaining = [...new Set(allChars)].filter(c => !gameState.guessedLetters[c]);
+            
+            if (remaining.length === 0) {
+                levelComplete();
+                return;
+            }
+
+            // Simple logic: pick first available, or random
+            gameState.targetLetter = remaining[0];
+            el.targetSpan.innerText = gameState.targetLetter;
+            
+            // Highlight specific boxes? (Optional, let's keep it clean)
+        }
+
+        function handleGuess(digit, btnElement) {
+            if (gameState.isPaused) return;
+
+            const correctDigit = gameState.letterMap[gameState.targetLetter];
+
+            if (digit === correctDigit) {
+                // Correct
+                gameState.guessedLetters[gameState.targetLetter] = true;
+                
+                // Calculate Score
+                const timeFactor = gameState.timeLeft / gameState.maxTime;
+                const points = Math.round(100 + (50 * timeFactor));
+                addScore(points);
+                
+                revealLetter(gameState.targetLetter, digit);
+                pickNextTarget();
+                flash(true);
+            } else {
+                // Wrong
+                addScore(-25); // Penalty
+                btnElement.classList.add('shake');
+                setTimeout(() => btnElement.classList.remove('shake'), 300);
+                flash(false);
+            }
+        }
+
+        function revealLetter(char, digit) {
+            const boxes = document.querySelectorAll(`.digit-box[data-char="${char}"]`);
+            boxes.forEach(box => {
+                box.innerText = digit;
+                box.classList.add('solved');
+            });
+        }
+
+        function useHint() {
+            if (gameState.isPaused) return;
+            addScore(-50);
+            const correctDigit = gameState.letterMap[gameState.targetLetter];
+            
+            // Simulate a correct click
+            revealLetter(gameState.targetLetter, correctDigit);
+            gameState.guessedLetters[gameState.targetLetter] = true;
+            
+            // Mark as hinted visually
+            const boxes = document.querySelectorAll(`.digit-box[data-char="${gameState.targetLetter}"]`);
+            boxes.forEach(b => b.classList.add('hinted'));
+
+            pickNextTarget();
+        }
+
+        function levelComplete() {
+            clearInterval(gameState.timerInterval);
+            
+            // Difficulty Progression
+            if (gameState.level < 3) gameState.level++;
+            
+            // Success Animation/Delay
+            el.msg.innerText = "Level Complete! Next level coming...";
+            el.msg.style.color = "var(--correct)";
+            
+            setTimeout(() => {
+                el.msg.style.color = "#636e72";
+                startLevel();
+            }, 2000);
+        }
+
+        function failLevel() {
+            clearInterval(gameState.timerInterval);
+            alert("Time's Up! Difficulty lowered.");
+            if (gameState.level > 1) gameState.level--;
+            startLevel();
+        }
+
+        // --- Core Utils ---
+
+        function addScore(amount) {
+            gameState.score += amount;
+            if (gameState.score < 0) gameState.score = 0;
+            gameState.scoreHistory.push(gameState.score);
+            updateUI();
+        }
+
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+            const pathLength = 126; // Approx circumference for r=20
+            
+            gameState.timerInterval = setInterval(() => {
+                if (gameState.isPaused) return;
+
+                gameState.timeLeft--;
+                
+                // Update Graphic
+                const percentage = gameState.timeLeft / gameState.maxTime;
+                const dashOffset = pathLength - (pathLength * percentage);
+                el.timerPath.style.strokeDashoffset = dashOffset;
+                
+                // Color shift based on urgency
+                if (percentage < 0.25) el.timerPath.style.stroke = "var(--wrong)";
+                else el.timerPath.style.stroke = "var(--accent)";
+
+                if (gameState.timeLeft <= 0) {
+                    failLevel();
+                }
+            }, 1000);
+        }
+
+        function updateUI() {
+            el.score.innerText = gameState.score;
+            
+            let lvlText = "Easy";
+            if (gameState.level === 2) lvlText = "Medium";
+            if (gameState.level === 3) lvlText = "Hard";
+            el.level.innerText = `Level ${gameState.level} (${lvlText})`;
+        }
+
+        function flash(isCorrect) {
+            document.body.style.backgroundColor = isCorrect ? "#dff9fb" : "#ffdad9";
+            setTimeout(() => {
+                document.body.style.backgroundColor = "var(--bg)";
+            }, 200);
+        }
+
+        // --- Modal & Tabs Logic ---
+
+        function showModal(id) {
+            el.modals[id].style.display = 'flex';
+            if (id === 'rules') {
+                gameState.isPaused = true; // Implicit pause on rules
+            }
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+            if (gameState.isPaused && !el.modals.pause.style.display === 'flex') {
+                gameState.isPaused = false;
+            }
+        }
+
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        // --- Pause & Stats Logic ---
+
+        function pauseGame() {
+            gameState.isPaused = true;
+            drawChart();
+            showModal('pause');
+        }
+
+        function resumeGame() {
+            gameState.isPaused = false;
+            closeModals();
+        }
+
+        function drawChart() {
+            const ctx = el.chart.getContext('2d');
+            const w = el.chart.width = el.chart.offsetWidth;
+            const h = el.chart.height = el.chart.offsetHeight;
+            const data = gameState.scoreHistory;
+
+            ctx.clearRect(0,0,w,h);
+            
+            if (data.length < 2) {
+                ctx.fillStyle = "#b2bec3";
+                ctx.fillText("No data yet", w/2 - 20, h/2);
+                return;
+            }
+
+            // Simple line chart
+            const maxVal = Math.max(...data, 100);
+            const stepX = w / (data.length - 1);
+            
+            ctx.beginPath();
+            ctx.moveTo(0, h - (data[0] / maxVal * h * 0.8) - 10);
+            
+            for (let i = 1; i < data.length; i++) {
+                const x = i * stepX;
+                const y = h - (data[i] / maxVal * h * 0.8) - 10;
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.strokeStyle = '#6C5CE7';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Fill gradient
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
+            ctx.fillStyle = "rgba(108, 92, 231, 0.1)";
+            ctx.fill();
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+</html>
