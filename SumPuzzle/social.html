@@ -107,12 +107,8 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Stats Grid (Updated to 3 Columns) */
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; /* 3 Columns */
-            gap: 8px; margin-bottom: 10px; 
-        }
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .stat-card { background: var(--bg); padding: 10px 5px; border-radius: 8px; text-align: center; }
         .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
         .stat-lbl { font-size: 0.65rem; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -130,15 +126,6 @@
         .lb-rank { font-weight: bold; color: var(--primary); width: 30px; }
         .lb-score { font-weight: bold; text-align: right; }
 
-        /* History Table Styling */
-        .history-table-container {
-            height: 140px; overflow-y: auto; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
-        }
-        .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .history-table th { position: sticky; top: 0; background: #dfe6e9; color: #636e72; padding: 5px 10px; text-align: left; font-size: 0.75rem; z-index: 2; }
-        .history-table td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); color: var(--dark); }
-        .history-table tr:nth-child(even) { background-color: rgba(255,255,255,0.5); }
-
         /* Scoring */
         .scoring-box { background: var(--bg); border-radius: 10px; padding: 10px 15px; margin-top: 5px; }
         .score-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 3px; }
@@ -146,12 +133,26 @@
         .plus { color: var(--correct); font-weight: bold; }
         .minus { color: var(--wrong); font-weight: bold; }
 
-        /* Chart & No Data Message */
-        canvas { width: 100%; height: 140px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px; }
+        /* Chart, Table & No Data Message - INCREASED HEIGHT TO 220px */
+        canvas { 
+            width: 100%; height: 220px; 
+            background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px; 
+        }
         .no-data {
-            width: 100%; height: 140px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
+            width: 100%; height: 220px; 
+            background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
             display: flex; justify-content: center; align-items: center; color: #b2bec3; font-weight: bold; font-size: 0.9rem;
         }
+        .history-table-container {
+            height: 220px; 
+            overflow-y: auto; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
+        }
+        /* End Height Increase */
+
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .history-table th { position: sticky; top: 0; background: #dfe6e9; color: #636e72; padding: 5px 10px; text-align: left; font-size: 0.75rem; z-index: 2; }
+        .history-table td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); color: var(--dark); }
+        .history-table tr:nth-child(even) { background-color: rgba(255,255,255,0.5); }
 
         .toast {
             position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
@@ -408,7 +409,6 @@
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
             
-            // Check Daily Participation on Start
             const todayStr = new Date().toDateString();
             if(gameState.stats.lastPlayedDate !== todayStr) {
                 gameState.stats.totalDays++;
@@ -522,7 +522,6 @@
         function updateUI() { el.score.innerText = gameState.score; }
         function loadData() { const saved = localStorage.getItem('sumPuzzle_stats_v11'); if (saved) gameState.stats = { ...gameState.stats, ...JSON.parse(saved) }; updateStatsUI(); }
         function saveData() { localStorage.setItem('sumPuzzle_stats_v11', JSON.stringify(gameState.stats)); }
-        
         function updateStats(newScore) {
             if (newScore > gameState.stats.highScore) {
                 const now = new Date(); gameState.stats.highScore = newScore; gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
@@ -566,14 +565,32 @@
         function setupNumpad() { for(let i=0; i<=9; i++) { const b=document.createElement('button'); b.className='num-btn'; b.innerText=i; b.onclick=()=>handleInput(i,b); el.numpad.appendChild(b); } }
         function setupKeyboard() { document.addEventListener('keydown', e => { if(e.key>='0'&&e.key<='9') { const b=[...document.querySelectorAll('.num-btn')].find(x=>x.innerText===e.key); handleInput(parseInt(e.key),b); } }); }
         
-        function openMenu(tab) { gameState.isPaused=true; updateSessionTime(); el.modals.menu.style.display='flex'; switchTab(tab); if(tab==='status') togglePerfChart('session'); }
+        function openMenu(tab) { 
+            gameState.isPaused=true; 
+            updateSessionTime(); 
+            el.modals.menu.style.display='flex'; 
+            switchTab(tab); 
+            
+            // FIX: If opening Status, run toggle logic immediately to handle empty state
+            if(tab === 'status') {
+                togglePerfChart('session');
+            }
+        }
         
         function resumeGame() { 
             el.modals.menu.style.display='none'; 
             if(!gameState.puzzle) { gameState.isPaused = false; startLevel(); } else { gameState.isPaused = false; }
         }
         
-        function switchTab(t) { document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active')); document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active'); document.getElementById(t).classList.add('active'); if(t==='leaderboard') fetchLeaderboard(); }
+        function switchTab(t) { 
+            document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active')); 
+            document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active'); 
+            document.getElementById(t).classList.add('active'); 
+            if(t==='leaderboard') fetchLeaderboard();
+            // FIX: If switching to status from within menu, trigger check
+            if(t==='status') togglePerfChart('session');
+        }
+        
         function setupTabs() { document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>switchTab(t.dataset.tab))); }
         
         function togglePerfChart(type) {
@@ -584,8 +601,13 @@
             
             if(type==='session') { 
                 document.getElementById('subTabSession').classList.add('active');
-                if(gameState.sessionHistory.length <= 1 && gameState.sessionHistory[0] === 0) { document.getElementById('msgSession').style.display='flex'; } 
-                else { document.getElementById('sessionChart').style.display='block'; drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7'); }
+                // LOGIC FIX: Check if sessionHistory is empty or only contains initial [0]
+                if(gameState.sessionHistory.length <= 1 && gameState.sessionHistory[0] === 0) { 
+                    document.getElementById('msgSession').style.display='flex'; 
+                } else { 
+                    document.getElementById('sessionChart').style.display='block'; 
+                    drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7'); 
+                }
             } else if (type==='history') { 
                 document.getElementById('subTabHistory').classList.add('active'); 
                 if(gameState.stats.historyScores.length === 0) { document.getElementById('msgHistory').style.display='flex'; } 
