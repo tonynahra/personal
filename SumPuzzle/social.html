@@ -107,11 +107,15 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .stat-card { background: var(--bg); padding: 10px; border-radius: 8px; text-align: center; }
+        /* Stats Grid (Updated to 3 Columns) */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; /* 3 Columns */
+            gap: 8px; margin-bottom: 10px; 
+        }
+        .stat-card { background: var(--bg); padding: 10px 5px; border-radius: 8px; text-align: center; }
         .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
-        .stat-lbl { font-size: 0.7rem; color: #636e72; text-transform: uppercase; }
+        .stat-lbl { font-size: 0.65rem; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* Tables */
         .rules-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 15px; }
@@ -160,7 +164,6 @@
         .sub-tab { padding: 5px 10px; cursor: pointer; font-size: 0.8rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; flex: 1; text-align: center; }
         .sub-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* Intro Buttons Grid */
         .intro-actions { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
 
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -252,6 +255,7 @@
                     <div class="stats-grid">
                         <div class="stat-card"><span class="stat-val" id="statMaxLvl">1</span><span class="stat-lbl">Max Level</span></div>
                         <div class="stat-card"><span class="stat-val" id="statLongestTime">0m</span><span class="stat-lbl">Longest Session</span></div>
+                        <div class="stat-card"><span class="stat-val" id="statDaysActive">1</span><span class="stat-lbl">Days Active</span></div>
                     </div>
                     <div class="sub-tabs">
                         <div class="sub-tab active" id="subTabSession" onclick="togglePerfChart('session')">Session</div>
@@ -266,8 +270,7 @@
                     <canvas id="historyChart" style="display:none;"></canvas>
 
                     <div id="historyTableContainer" class="history-table-container" style="display:none;">
-                        <table class="history-table" id="historyTable">
-                            </table>
+                        <table class="history-table" id="historyTable"></table>
                         <div id="msgTable" class="no-data" style="display:none; height:100%;">No data yet.</div>
                     </div>
 
@@ -339,7 +342,10 @@
 
         const gameState = {
             score: 0,
-            stats: { highScore: 0, highScoreDate: '-', maxLevel: 1, longestSession: 0, historyScores: [] },
+            stats: { 
+                highScore: 0, highScoreDate: '-', maxLevel: 1, longestSession: 0, 
+                historyScores: [], totalDays: 0, lastPlayedDate: '' 
+            },
             level: 1, timeLeft: 0, maxTime: 60, timerInterval: null,
             puzzle: null, letterMap: {}, reverseMap: {}, guessedLetters: {}, selectedChar: null,
             sessionHistory: [0], isPaused: true, isTransitioning: false, sessionStartTime: Date.now(),
@@ -363,6 +369,7 @@
             toast: document.getElementById('toast'),
             statMaxLvl: document.getElementById('statMaxLvl'),
             statLongestTime: document.getElementById('statLongestTime'),
+            statDaysActive: document.getElementById('statDaysActive'),
             modals: { intro: document.getElementById('introModal'), menu: document.getElementById('menuModal'), submit: document.getElementById('submitModal') }
         };
 
@@ -370,12 +377,12 @@
             setupNumpad(); setupTabs(); setupKeyboard(); loadData();
             fetch('daily.php').then(res => res.json()).then(data => {
                 gameState.dailySeedBase = data.seed; dailyGameId = data.gameId; 
-                el.modals.intro.style.display = 'flex'; // ALWAYS show Hub on load
+                el.modals.intro.style.display = 'flex';
             }).catch(err => {
                 const now = new Date();
                 gameState.dailySeedBase = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
                 dailyGameId = 0; 
-                el.modals.intro.style.display = 'flex'; // ALWAYS show Hub
+                el.modals.intro.style.display = 'flex';
             });
                 
             document.getElementById('rulesBtn').onclick = () => openMenu('rules');
@@ -400,6 +407,16 @@
         function startLevel() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
+            
+            // Check Daily Participation on Start
+            const todayStr = new Date().toDateString();
+            if(gameState.stats.lastPlayedDate !== todayStr) {
+                gameState.stats.totalDays++;
+                gameState.stats.lastPlayedDate = todayStr;
+                saveData();
+                updateStatsUI();
+            }
+
             updateStats(gameState.score); 
             el.level.innerText = `Daily #${dailyGameId} | Level ${gameState.level}`;
             currentSeed = gameState.dailySeedBase + (gameState.level * 10000);
@@ -509,7 +526,6 @@
         function updateStats(newScore) {
             if (newScore > gameState.stats.highScore) {
                 const now = new Date(); gameState.stats.highScore = newScore; gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
-                // Add Level to history object
                 gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate, level: gameState.level });
                 if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
             }
@@ -517,7 +533,12 @@
             saveData(); updateStatsUI();
         }
         function updateSessionTime() { const sec = (Date.now() - gameState.sessionStartTime) / 1000; if (sec > gameState.stats.longestSession) { gameState.stats.longestSession = sec; saveData(); updateStatsUI(); } }
-        function updateStatsUI() { el.highScore.innerText = `Best: ${gameState.stats.highScore}`; el.statMaxLvl.innerText = gameState.stats.maxLevel; el.statLongestTime.innerText = Math.floor(gameState.stats.longestSession / 60) + "m"; }
+        function updateStatsUI() { 
+            el.highScore.innerText = `Best: ${gameState.stats.highScore}`; 
+            el.statMaxLvl.innerText = gameState.stats.maxLevel; 
+            el.statLongestTime.innerText = Math.floor(gameState.stats.longestSession / 60) + "m"; 
+            el.statDaysActive.innerText = gameState.stats.totalDays || 1;
+        }
         async function shareScore() {
             let squares = gameState.score > 1000 ? "🟩🟩🟩" : (gameState.score > 500 ? "🟩🟩🟨" : "🟩🟨⬜");
             const text = `SumPuzzle Daily #${dailyGameId} 🧠\nScore: ${gameState.score}\n${squares}\n\nPlay: https://mediamaze.com/SP/`;
@@ -549,14 +570,7 @@
         
         function resumeGame() { 
             el.modals.menu.style.display='none'; 
-            
-            // FIX: If puzzle is null (user went Intro -> Leaderboard -> Resume), start the game.
-            if(!gameState.puzzle) {
-                gameState.isPaused = false;
-                startLevel();
-            } else {
-                gameState.isPaused = false; 
-            }
+            if(!gameState.puzzle) { gameState.isPaused = false; startLevel(); } else { gameState.isPaused = false; }
         }
         
         function switchTab(t) { document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active')); document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active'); document.getElementById(t).classList.add('active'); if(t==='leaderboard') fetchLeaderboard(); }
@@ -578,20 +592,16 @@
                 else { document.getElementById('historyChart').style.display='block'; drawChart(el.historyChart, gameState.stats.historyScores.map(x=>x.score), '#00CEC9'); }
             } else if (type==='table') {
                 document.getElementById('subTabTable').classList.add('active');
-                document.getElementById('historyTableContainer').style.display='block';
-                if(gameState.stats.historyScores.length === 0) { document.getElementById('msgTable').style.display='flex'; }
-                else { renderHistoryTable(); }
+                if(gameState.stats.historyScores.length === 0) { document.getElementById('msgTable').style.display='flex'; document.getElementById('historyTableContainer').style.display='block'; }
+                else { document.getElementById('historyTableContainer').style.display='block'; renderHistoryTable(); }
             }
         }
 
         function renderHistoryTable() {
             const table = document.getElementById('historyTable');
-            // Reverse copy to show newest first
             const data = [...gameState.stats.historyScores].reverse();
             let html = `<thead><tr><th>Date</th><th>Lvl</th><th>Score</th></tr></thead><tbody>`;
-            data.forEach(row => {
-                html += `<tr><td>${row.date}</td><td>${row.level || '-'}</td><td>${row.score}</td></tr>`;
-            });
+            data.forEach(row => { html += `<tr><td>${row.date}</td><td>${row.level || '-'}</td><td>${row.score}</td></tr>`; });
             html += `</tbody>`;
             table.innerHTML = html;
         }
