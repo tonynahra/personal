@@ -133,9 +133,6 @@
         .plus { color: var(--correct); font-weight: bold; }
         .minus { color: var(--wrong); font-weight: bold; }
 
-        .checkbox-container { display: flex; align-items: center; margin-top: 15px; font-size: 0.9rem; color: #636e72; }
-        .checkbox-container input { margin-right: 10px; transform: scale(1.2); }
-        
         /* Chart & No Data Message */
         canvas { width: 100%; height: 140px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px; }
         .no-data {
@@ -203,19 +200,19 @@
     <div class="modal-overlay" id="introModal" style="z-index: 200;">
         <div class="modal">
             <div style="font-size:3rem; text-align:center; margin-bottom:10px;">🧠</div>
-            <h2 style="margin-top:0; text-align:center;">Daily Brain Training</h2>
+            <h2 style="margin-top:0; text-align:center;">Train Your Brain</h2>
             <p style="color:#636e72; line-height: 1.5; font-size: 1rem; text-align: center;">
-                Every day, a new set of puzzles is generated. Everyone plays the exact same levels.
+                Welcome to <strong>SumPuzzle</strong>. Crack the code where letters represent hidden digits.
             </p>
+            
+            <div style="background:var(--bg); padding:15px; border-radius:8px; margin: 15px 0;">
+                <h4 style="margin:0 0 5px 0; color:var(--dark);">Goal:</h4>
+                <p style="margin:0; font-size:0.9rem; color:#636e72;">Solve the arithmetic equations to advance levels. Higher levels add more digits and complexity.</p>
+            </div>
             
             <div class="intro-actions">
                 <button class="num-btn" style="background:var(--primary); color:white; border:none;" onclick="closeIntro()">▶ Start Puzzle</button>
                 <button class="num-btn" style="background:white; color:var(--dark); border:2px solid var(--light);" onclick="viewLeaderboardFromIntro()">🏆 Global Leaderboard</button>
-            </div>
-
-            <div class="checkbox-container" style="justify-content: center;">
-                <input type="checkbox" id="dontShowAgain">
-                <label for="dontShowAgain">Don't show this again</label>
             </div>
         </div>
     </div>
@@ -354,11 +351,13 @@
         function init() {
             setupNumpad(); setupTabs(); setupKeyboard(); loadData();
             fetch('daily.php').then(res => res.json()).then(data => {
-                gameState.dailySeedBase = data.seed; dailyGameId = data.gameId; checkIntro();
+                gameState.dailySeedBase = data.seed; dailyGameId = data.gameId; 
+                el.modals.intro.style.display = 'flex'; // ALWAYS show Hub on load
             }).catch(err => {
                 const now = new Date();
                 gameState.dailySeedBase = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
-                dailyGameId = 0; checkIntro();
+                dailyGameId = 0; 
+                el.modals.intro.style.display = 'flex'; // ALWAYS show Hub
             });
                 
             document.getElementById('rulesBtn').onclick = () => openMenu('rules');
@@ -368,10 +367,10 @@
             setInterval(updateSessionTime, 30000); 
         }
 
-        function checkIntro() {
-            const skip = localStorage.getItem('sumPuzzle_skipIntro');
-            if(skip === 'true') { gameState.isPaused = false; startLevel(); } 
-            else { el.modals.intro.style.display = 'flex'; }
+        function closeIntro() {
+            el.modals.intro.style.display = 'none'; 
+            gameState.isPaused = false; 
+            startLevel(); 
         }
 
         function viewLeaderboardFromIntro() {
@@ -525,7 +524,6 @@
         function showToast(text) { el.toast.innerText=text; el.toast.classList.add('show'); setTimeout(()=>el.toast.classList.remove('show'),2000); }
         function setupNumpad() { for(let i=0; i<=9; i++) { const b=document.createElement('button'); b.className='num-btn'; b.innerText=i; b.onclick=()=>handleInput(i,b); el.numpad.appendChild(b); } }
         function setupKeyboard() { document.addEventListener('keydown', e => { if(e.key>='0'&&e.key<='9') { const b=[...document.querySelectorAll('.num-btn')].find(x=>x.innerText===e.key); handleInput(parseInt(e.key),b); } }); }
-        function closeIntro() { if(document.getElementById('dontShowAgain').checked) localStorage.setItem('sumPuzzle_skipIntro', 'true'); el.modals.intro.style.display='none'; gameState.isPaused=false; startLevel(); }
         function openMenu(tab) { gameState.isPaused=true; updateSessionTime(); el.modals.menu.style.display='flex'; switchTab(tab); if(tab==='status') togglePerfChart('session'); }
         function resumeGame() { el.modals.menu.style.display='none'; gameState.isPaused=false; }
         function switchTab(t) { document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active')); document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active'); document.getElementById(t).classList.add('active'); if(t==='leaderboard') fetchLeaderboard(); }
