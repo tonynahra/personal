@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SumPuzzle - Brain Training V8</title>
+    <title>SumPuzzle - Brain Training V9</title>
     
     <meta name="description" content="Exercise your brain with SumPuzzle. Improve cognitive function and arithmetic speed.">
     <meta property="og:title" content="SumPuzzle - Brain Training">
@@ -85,11 +85,12 @@
             max-height: 90vh; overflow-y: auto;
         }
 
-        /* Fixed Menu Modal (Fixed height for Stats/Rules) */
+        /* Fixed Menu Modal (Taller Height) */
         .modal.menu-modal {
-            height: 550px; /* Fixed height */
+            height: 680px; /* INCREASED HEIGHT */
+            max-height: 95vh;
             display: flex; flex-direction: column;
-            padding: 0; /* Padding moved to inner containers */
+            padding: 0; 
         }
         .menu-header { padding: 1.5rem 1.5rem 0 1.5rem; flex-shrink: 0; }
         .menu-body { padding: 1.5rem; flex: 1; overflow-y: auto; }
@@ -381,7 +382,7 @@
                 gameState.stats.highScore = newScore;
                 gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
                 
-                // Add to history if it's a new high score or significantly high (simple logic: just push current score if it's a PB)
+                // Add to history if it's a new high score
                 gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate });
                 if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
             }
