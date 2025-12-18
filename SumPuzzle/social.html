@@ -126,6 +126,15 @@
         .lb-rank { font-weight: bold; color: var(--primary); width: 30px; }
         .lb-score { font-weight: bold; text-align: right; }
 
+        /* History Table Styling */
+        .history-table-container {
+            height: 140px; overflow-y: auto; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
+        }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .history-table th { position: sticky; top: 0; background: #dfe6e9; color: #636e72; padding: 5px 10px; text-align: left; font-size: 0.75rem; z-index: 2; }
+        .history-table td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); color: var(--dark); }
+        .history-table tr:nth-child(even) { background-color: rgba(255,255,255,0.5); }
+
         /* Scoring */
         .scoring-box { background: var(--bg); border-radius: 10px; padding: 10px 15px; margin-top: 5px; }
         .score-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 3px; }
@@ -147,8 +156,8 @@
         }
         .toast.show { opacity: 1; }
         
-        .sub-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; background: var(--bg); padding: 5px; border-radius: 8px; }
-        .sub-tab { padding: 5px 15px; cursor: pointer; font-size: 0.85rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; }
+        .sub-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 10px; background: var(--bg); padding: 5px; border-radius: 8px; }
+        .sub-tab { padding: 5px 10px; cursor: pointer; font-size: 0.8rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; flex: 1; text-align: center; }
         .sub-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         /* Intro Buttons Grid */
@@ -247,6 +256,7 @@
                     <div class="sub-tabs">
                         <div class="sub-tab active" id="subTabSession" onclick="togglePerfChart('session')">Session</div>
                         <div class="sub-tab" id="subTabHistory" onclick="togglePerfChart('history')">History</div>
+                        <div class="sub-tab" id="subTabTable" onclick="togglePerfChart('table')">Table</div>
                     </div>
                     
                     <div id="msgSession" class="no-data" style="display:none;">Play a game to see stats!</div>
@@ -254,6 +264,12 @@
                     
                     <div id="msgHistory" class="no-data" style="display:none;">No high scores saved yet.</div>
                     <canvas id="historyChart" style="display:none;"></canvas>
+
+                    <div id="historyTableContainer" class="history-table-container" style="display:none;">
+                        <table class="history-table" id="historyTable">
+                            </table>
+                        <div id="msgTable" class="no-data" style="display:none; height:100%;">No data yet.</div>
+                    </div>
 
                     <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="shareScore()">📤 Share to Socials</button>
                     <button class="num-btn" style="width:100%; margin-top:10px; background:var(--correct); color:white; border:none;" onclick="openSubmitModal()">🌍 Global Leaderboard</button>
@@ -340,8 +356,10 @@
             msg: document.getElementById('messageArea'),
             sessionChart: document.getElementById('sessionChart'),
             historyChart: document.getElementById('historyChart'),
+            historyTableContainer: document.getElementById('historyTableContainer'),
             msgSession: document.getElementById('msgSession'),
             msgHistory: document.getElementById('msgHistory'),
+            msgTable: document.getElementById('msgTable'),
             toast: document.getElementById('toast'),
             statMaxLvl: document.getElementById('statMaxLvl'),
             statLongestTime: document.getElementById('statLongestTime'),
@@ -487,10 +505,12 @@
         function updateUI() { el.score.innerText = gameState.score; }
         function loadData() { const saved = localStorage.getItem('sumPuzzle_stats_v11'); if (saved) gameState.stats = { ...gameState.stats, ...JSON.parse(saved) }; updateStatsUI(); }
         function saveData() { localStorage.setItem('sumPuzzle_stats_v11', JSON.stringify(gameState.stats)); }
+        
         function updateStats(newScore) {
             if (newScore > gameState.stats.highScore) {
                 const now = new Date(); gameState.stats.highScore = newScore; gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
-                gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate });
+                // Add Level to history object
+                gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate, level: gameState.level });
                 if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
             }
             if (gameState.level > gameState.stats.maxLevel) gameState.stats.maxLevel = gameState.level;
@@ -524,33 +544,58 @@
         function showToast(text) { el.toast.innerText=text; el.toast.classList.add('show'); setTimeout(()=>el.toast.classList.remove('show'),2000); }
         function setupNumpad() { for(let i=0; i<=9; i++) { const b=document.createElement('button'); b.className='num-btn'; b.innerText=i; b.onclick=()=>handleInput(i,b); el.numpad.appendChild(b); } }
         function setupKeyboard() { document.addEventListener('keydown', e => { if(e.key>='0'&&e.key<='9') { const b=[...document.querySelectorAll('.num-btn')].find(x=>x.innerText===e.key); handleInput(parseInt(e.key),b); } }); }
+        
         function openMenu(tab) { gameState.isPaused=true; updateSessionTime(); el.modals.menu.style.display='flex'; switchTab(tab); if(tab==='status') togglePerfChart('session'); }
-        function resumeGame() { el.modals.menu.style.display='none'; gameState.isPaused=false; }
+        
+        function resumeGame() { 
+            el.modals.menu.style.display='none'; 
+            
+            // FIX: If puzzle is null (user went Intro -> Leaderboard -> Resume), start the game.
+            if(!gameState.puzzle) {
+                gameState.isPaused = false;
+                startLevel();
+            } else {
+                gameState.isPaused = false; 
+            }
+        }
+        
         function switchTab(t) { document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active')); document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active'); document.getElementById(t).classList.add('active'); if(t==='leaderboard') fetchLeaderboard(); }
         function setupTabs() { document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>switchTab(t.dataset.tab))); }
+        
         function togglePerfChart(type) {
-            document.getElementById('subTabSession').classList.remove('active'); document.getElementById('subTabHistory').classList.remove('active');
-            document.getElementById('sessionChart').style.display='none'; document.getElementById('historyChart').style.display='none';
-            document.getElementById('msgSession').style.display='none'; document.getElementById('msgHistory').style.display='none';
+            document.getElementById('subTabSession').classList.remove('active'); document.getElementById('subTabHistory').classList.remove('active'); document.getElementById('subTabTable').classList.remove('active');
+            document.getElementById('sessionChart').style.display='none'; document.getElementById('historyChart').style.display='none'; 
+            document.getElementById('historyTableContainer').style.display='none';
+            document.getElementById('msgSession').style.display='none'; document.getElementById('msgHistory').style.display='none'; document.getElementById('msgTable').style.display='none';
             
             if(type==='session') { 
                 document.getElementById('subTabSession').classList.add('active');
-                if(gameState.sessionHistory.length <= 1 && gameState.sessionHistory[0] === 0) {
-                     document.getElementById('msgSession').style.display='flex';
-                } else {
-                     document.getElementById('sessionChart').style.display='block'; 
-                     drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7'); 
-                }
-            } else { 
+                if(gameState.sessionHistory.length <= 1 && gameState.sessionHistory[0] === 0) { document.getElementById('msgSession').style.display='flex'; } 
+                else { document.getElementById('sessionChart').style.display='block'; drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7'); }
+            } else if (type==='history') { 
                 document.getElementById('subTabHistory').classList.add('active'); 
-                if(gameState.stats.historyScores.length === 0) {
-                     document.getElementById('msgHistory').style.display='flex';
-                } else {
-                     document.getElementById('historyChart').style.display='block'; 
-                     drawChart(el.historyChart, gameState.stats.historyScores.map(x=>x.score), '#00CEC9'); 
-                }
+                if(gameState.stats.historyScores.length === 0) { document.getElementById('msgHistory').style.display='flex'; } 
+                else { document.getElementById('historyChart').style.display='block'; drawChart(el.historyChart, gameState.stats.historyScores.map(x=>x.score), '#00CEC9'); }
+            } else if (type==='table') {
+                document.getElementById('subTabTable').classList.add('active');
+                document.getElementById('historyTableContainer').style.display='block';
+                if(gameState.stats.historyScores.length === 0) { document.getElementById('msgTable').style.display='flex'; }
+                else { renderHistoryTable(); }
             }
         }
+
+        function renderHistoryTable() {
+            const table = document.getElementById('historyTable');
+            // Reverse copy to show newest first
+            const data = [...gameState.stats.historyScores].reverse();
+            let html = `<thead><tr><th>Date</th><th>Lvl</th><th>Score</th></tr></thead><tbody>`;
+            data.forEach(row => {
+                html += `<tr><td>${row.date}</td><td>${row.level || '-'}</td><td>${row.score}</td></tr>`;
+            });
+            html += `</tbody>`;
+            table.innerHTML = html;
+        }
+
         function drawChart(c,data,color) {
             const ctx=c.getContext('2d'); c.width=c.clientWidth; c.height=c.clientHeight; ctx.clearRect(0,0,c.width,c.height);
             const max=Math.max(...data,100), step=c.width/Math.max(data.length-1,1);
