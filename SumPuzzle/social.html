@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SumPuzzle - Daily Brain Training</title>
+    
+    <meta name="description" content="Exercise your brain with SumPuzzle. Solve the daily arithmetic cipher.">
+    <meta property="og:title" content="SumPuzzle - Daily Challenge">
+    <meta property="og:description" content="Can you crack today's code? Play the daily math puzzle.">
+    <meta property="og:image" content="https://mediamaze.com/SP/preview.jpg"> 
+    
+    <style>
+        :root {
+            --primary: #6C5CE7; --secondary: #00CEC9; --accent: #FD79A8;
+            --dark: #2D3436; --light: #DFE6E9; --bg: #F0F3F5;
+            --correct: #00B894; --wrong: #D63031; --select: #74b9ff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg); margin: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; color: var(--dark); user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .game-container {
+            background: white; padding: 2rem; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 450px;
+            display: flex; flex-direction: column; gap: 1.5rem; position: relative;
+        }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .score-box { display: flex; flex-direction: column; }
+        .score-label { font-size: 0.7rem; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; }
+        .score-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .high-score { font-size: 0.75rem; color: #636e72; margin-top: 2px; }
+        .level-badge { background: var(--light); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+
+        /* Timer */
+        .timer-container { position: relative; width: 50px; height: 50px; }
+        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .timer-circle { fill: none; stroke: var(--light); stroke-width: 5; }
+        .timer-path { fill: none; stroke: var(--accent); stroke-width: 5; stroke-dasharray: 126; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+
+        /* Board */
+        .board-container { background: var(--bg); padding: 1.5rem; border-radius: 12px; display: flex; justify-content: center; }
+        .math-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 15px; font-family: 'Courier New', Courier, monospace; font-size: 2.2rem; font-weight: bold; }
+        .operator-cell { grid-column: 1; grid-row: 2; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+        .number-row { grid-column: 2; display: flex; justify-content: flex-end; gap: 8px; }
+        .sum-line { grid-column: 1 / span 2; height: 4px; background: var(--dark); border-radius: 2px; margin: 5px 0; }
+        .char-box {
+            width: 40px; height: 50px; display: flex; justify-content: center; align-items: center;
+            background: white; border-radius: 8px; border: 2px solid transparent; cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 1.8rem;
+        }
+        .char-box.selected { background-color: var(--select); color: white; border-color: var(--primary); }
+        .char-box.solved { background-color: transparent; color: var(--correct); font-weight: 900; cursor: default; }
+        .char-box.hinted { color: var(--secondary); }
+        .instruction { text-align: center; color: #636e72; font-size: 0.9rem; min-height: 1.2rem; font-weight: 500; }
+
+        /* Controls */
+        .controls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .num-btn { background: white; border: 2px solid var(--light); border-radius: 10px; padding: 15px 0; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: var(--dark); }
+        .num-btn:active { transform: scale(0.95); }
+
+        /* Footer */
+        .action-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .top-actions { grid-column: 1 / span 2; display: flex; justify-content: space-between; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; color: #636e72; display: flex; align-items: center; gap: 5px; padding: 8px; }
+        .icon-btn:hover { background: var(--light); color: var(--dark); }
+        .skip-btn { color: var(--wrong); }
+        .hint-btn { color: var(--secondary); }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); display: none;
+            justify-content: center; align-items: center; z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Base Modal */
+        .modal { 
+            background: white; border-radius: 15px; 
+            width: 88%; max-width: 430px; 
+            padding: 2rem; position: relative; animation: slideUp 0.3s ease;
+            max-height: 90vh; overflow-y: auto;
+        }
+
+        /* Fixed Menu Modal */
+        .modal.menu-modal {
+            height: 680px; max-height: 95vh;
+            display: flex; flex-direction: column; padding: 0; 
+        }
+        .menu-header { padding: 1.5rem 1.5rem 0 1.5rem; flex-shrink: 0; }
+        .menu-body { padding: 1.5rem; flex: 1; overflow-y: auto; }
+
+        .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 1rem; }
+        .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-card { background: var(--bg); padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
+        .stat-lbl { font-size: 0.7rem; color: #636e72; text-transform: uppercase; }
+
+        .lb-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .lb-table th { text-align: left; color: #b2bec3; padding-bottom: 5px; font-size: 0.8rem; }
+        .lb-table td { padding: 8px 0; border-bottom: 1px solid var(--light); }
+        .lb-rank { font-weight: bold; color: var(--primary); width: 30px; }
+        .lb-score { font-weight: bold; text-align: right; }
+
+        .checkbox-container { display: flex; align-items: center; margin-top: 15px; font-size: 0.9rem; color: #636e72; }
+        .checkbox-container input { margin-right: 10px; transform: scale(1.2); }
+        canvas { width: 100%; height: 150px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 15px; }
+        
+        .toast {
+            position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+            background: var(--dark); color: white; padding: 10px 20px; border-radius: 20px;
+            font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200;
+        }
+        .toast.show { opacity: 1; }
+        .sub-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; background: var(--bg); padding: 5px; border-radius: 8px; }
+        .sub-tab { padding: 5px 15px; cursor: pointer; font-size: 0.85rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; }
+        .sub-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .shake { animation: shake 0.3s; border-color: var(--wrong); color: var(--wrong); }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="toast" class="toast">Notice</div>
+        <div class="header">
+            <div class="score-box">
+                <span class="score-label">Score</span>
+                <span class="score-value" id="scoreDisplay">0</span>
+                <span class="high-score" id="highScoreDisplay">Best: 0</span>
+            </div>
+            <div class="level-badge" id="levelDisplay">Daily Challenge</div>
+            <div class="timer-container">
+                <svg class="timer-svg">
+                    <circle class="timer-circle" cx="25" cy="25" r="20"></circle>
+                    <path class="timer-path" id="timerPath" d="M 25, 25 m 0, -20 a 20,20 0 1,0 0,40 a 20,20 0 1,0 0,-40"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="board-container">
+            <div class="math-grid" id="mathGrid"></div>
+        </div>
+        <div class="instruction" id="messageArea">Loading Daily Puzzle...</div>
+
+        <div class="controls" id="numpad"></div>
+
+        <div class="action-bar">
+            <div class="top-actions">
+                <button class="icon-btn" id="rulesBtn"><span>?</span> Rules</button>
+                <button class="icon-btn" id="statsBtn"><span>📊</span> Stats</button>
+            </div>
+            <div class="top-actions" style="margin-top:10px; border-top: 1px solid var(--light); padding-top:10px;">
+                <button class="icon-btn skip-btn" id="skipBtn"><span>⏩</span> Skip (-50)</button>
+                <button class="icon-btn hint-btn" id="hintBtn"><span>💡</span> Hint (-50)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="introModal" style="z-index: 200;">
+        <div class="modal">
+            <div style="font-size:3rem; text-align:center; margin-bottom:10px;">🧠</div>
+            <h2 style="margin-top:0; text-align:center;">Daily Brain Training</h2>
+            <p style="color:#636e72; line-height: 1.5; font-size: 1rem;">
+                Welcome to <strong>SumPuzzle</strong>. Every day, a new set of puzzles is generated. Everyone plays the exact same levels.
+            </p>
+            <div style="background:var(--bg); padding:15px; border-radius:8px; margin: 15px 0;">
+                <h4 style="margin:0 0 5px 0; color:var(--dark);">Goal:</h4>
+                <p style="margin:0; font-size:0.9rem; color:#636e72;">Solve the arithmetic equations to advance. Compete for the highest daily score.</p>
+            </div>
+            <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeIntro()">Start Today's Puzzle</button>
+            <div class="checkbox-container">
+                <input type="checkbox" id="dontShowAgain">
+                <label for="dontShowAgain">Don't show this again</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="submitModal" style="z-index: 250;">
+        <div class="modal">
+            <h3 style="text-align:center; margin-top:0;">Global Leaderboard</h3>
+            <p style="text-align:center; color:#636e72;">Submit your score to the world!</p>
+            <input type="text" id="playerName" placeholder="Enter your name" style="width:100%; padding:10px; border:2px solid var(--light); border-radius:8px; font-size:1rem; margin-bottom:10px; box-sizing:border-box;">
+            <button class="num-btn" style="width:100%; background:var(--correct); color:white; border:none;" onclick="submitScoreToPHP()">Submit</button>
+            <button class="icon-btn" style="width:100%; justify-content:center; margin-top:10px;" onclick="document.getElementById('submitModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="menuModal">
+        <div class="modal menu-modal">
+            <div class="menu-header">
+                <div class="tabs">
+                    <div class="tab active" data-tab="status">Stats</div>
+                    <div class="tab" data-tab="leaderboard">Leaderboard</div>
+                    <div class="tab" data-tab="rules">Rules</div>
+                </div>
+            </div>
+
+            <div class="menu-body">
+                <div id="status" class="tab-content active">
+                    <h3 style="text-align: center; margin-top:0;">Your Performance</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card"><span class="stat-val" id="statMaxLvl">1</span><span class="stat-lbl">Max Level</span></div>
+                        <div class="stat-card"><span class="stat-val" id="statLongestTime">0m</span><span class="stat-lbl">Longest Session</span></div>
+                    </div>
+                    <div class="sub-tabs">
+                        <div class="sub-tab active" id="subTabSession" onclick="togglePerfChart('session')">Session</div>
+                        <div class="sub-tab" id="subTabHistory" onclick="togglePerfChart('history')">History</div>
+                    </div>
+                    <canvas id="sessionChart"></canvas>
+                    <canvas id="historyChart" style="display:none;"></canvas>
+                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="shareScore()">📤 Share to Socials</button>
+                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--correct); color:white; border:none;" onclick="openSubmitModal()">🌍 Global Leaderboard</button>
+                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--light); color:var(--dark); border:none;" onclick="resumeGame()">Resume Game</button>
+                </div>
+
+                <div id="leaderboard" class="tab-content">
+                    <h3 style="text-align:center; margin-top:0;">Top Players</h3>
+                    <div id="lbLoading" style="text-align:center; color:#b2bec3;">Loading...</div>
+                    <table class="lb-table" id="lbTable"></table>
+                    <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="fetchLeaderboard()">Refresh</button>
+                </div>
+                
+                <div id="rules" class="tab-content">
+                    <h3 style="margin-top:0;">Rules & Levels</h3>
+                    <p style="color:#636e72;">Letters represent digits 0-9. No letter represents the same digit.</p>
+                    <ul style="color:#636e72; padding-left:20px;">
+                        <li>Lvl 1 (Easy): 2 Digits</li>
+                        <li>Lvl 2 (Med): 3 Digits</li>
+                        <li>Lvl 3 (Hard): 4 Digits</li>
+                        <li>Lvl 4 (Expert): 5 Digits</li>
+                        <li>Lvl 5 (Master): 6 Digits</li>
+                    </ul>
+                    <div style="margin-top:20px; font-size:0.9rem; color:#636e72;">
+                        <strong>Scoring:</strong><br>
+                        Correct: +100pts + Speed Bonus.<br>
+                        Wrong: -25pts. Hint/Skip: -50pts.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SEEDED RNG LOGIC (For Daily Puzzle) ---
+        let currentSeed = 1;
+        let dailyGameId = 1;
+        
+        // Linear Congruential Generator
+        function seededRandom() {
+            const a = 1664525; const c = 1013904223; const m = 4294967296;
+            currentSeed = (a * currentSeed + c) % m;
+            return currentSeed / m;
+        }
+
+        const LEVELS = {
+            1: { digits: 2, distinct: 4, time: 90 },
+            2: { digits: 3, distinct: 6, time: 120 },
+            3: { digits: 4, distinct: 8, time: 180 },
+            4: { digits: 5, distinct: 9, time: 240 },
+            5: { digits: 6, distinct: 10, time: 300 }
+        };
+
+        const gameState = {
+            score: 0,
+            stats: { highScore: 0, highScoreDate: '-', maxLevel: 1, longestSession: 0, historyScores: [] },
+            level: 1, timeLeft: 0, maxTime: 60, timerInterval: null,
+            puzzle: null, letterMap: {}, reverseMap: {}, guessedLetters: {}, selectedChar: null,
+            sessionHistory: [0], isPaused: true, isTransitioning: false, sessionStartTime: Date.now(),
+            dailySeedBase: 0 // Stores the base seed from server
+        };
+
+        const el = {
+            score: document.getElementById('scoreDisplay'),
+            highScore: document.getElementById('highScoreDisplay'),
+            level: document.getElementById('levelDisplay'),
+            grid: document.getElementById('mathGrid'),
+            numpad: document.getElementById('numpad'),
+            timerPath: document.getElementById('timerPath'),
+            msg: document.getElementById('messageArea'),
+            sessionChart: document.getElementById('sessionChart'),
+            historyChart: document.getElementById('historyChart'),
+            toast: document.getElementById('toast'),
+            statMaxLvl: document.getElementById('statMaxLvl'),
+            statLongestTime: document.getElementById('statLongestTime'),
+            modals: { intro: document.getElementById('introModal'), menu: document.getElementById('menuModal'), submit: document.getElementById('submitModal') }
+        };
+
+        function init() {
+            setupNumpad(); setupTabs(); setupKeyboard(); loadData();
+            
+            // Fetch Daily Seed
+            fetch('daily.php')
+                .then(res => res.json())
+                .then(data => {
+                    gameState.dailySeedBase = data.seed;
+                    dailyGameId = data.gameId;
+                    el.level.innerText = `Daily #${dailyGameId}`;
+                    checkIntro();
+                })
+                .catch(err => {
+                    console.warn("Offline mode or Server Error");
+                    // Fallback to local date seed
+                    const now = new Date();
+                    gameState.dailySeedBase = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
+                    dailyGameId = 0;
+                    checkIntro();
+                });
+                
+            document.getElementById('rulesBtn').onclick = () => openMenu('rules');
+            document.getElementById('statsBtn').onclick = () => openMenu('status');
+            document.getElementById('hintBtn').onclick = useHint;
+            document.getElementById('skipBtn').onclick = skipLevel;
+            setInterval(updateSessionTime, 30000); 
+        }
+
+        function checkIntro() {
+            const skip = localStorage.getItem('sumPuzzle_skipIntro');
+            if(skip === 'true') { gameState.isPaused = false; startLevel(); } 
+            else { el.modals.intro.style.display = 'flex'; }
+        }
+
+        // --- Core Game ---
+        function startLevel() {
+            clearInterval(gameState.timerInterval);
+            gameState.isTransitioning = false;
+            updateStats(gameState.score); 
+            el.level.innerText = `Daily #${dailyGameId} - Lvl ${gameState.level}`;
+
+            // Reset Seed based on Level to ensure Level 2 is always Level 2
+            currentSeed = gameState.dailySeedBase + (gameState.level * 10000);
+
+            const config = LEVELS[gameState.level] || LEVELS[5];
+            gameState.maxTime = config.time;
+            gameState.timeLeft = config.time;
+            gameState.guessedLetters = {};
+            gameState.selectedChar = null;
+            el.msg.innerText = "Select a letter above, then guess a number.";
+            el.msg.style.color = "#636e72";
+
+            generatePuzzle(config);
+            renderBoard();
+            startTimer();
+            updateUI();
+        }
+
+        function generatePuzzle(config, attempts = 0) {
+            if(attempts > 50) config.distinct = Math.max(3, config.distinct - 1);
+            const min = Math.pow(10, config.digits - 1);
+            const max = Math.pow(10, config.digits) - 1;
+            
+            let n1 = Math.floor(seededRandom() * (max - min) + min);
+            let n2 = Math.floor(seededRandom() * (max - min) + min);
+            let sum = n1 + n2;
+            const uniqueDigits = [...new Set(`${n1}${n2}${sum}`.split(''))];
+
+            if ((uniqueDigits.length < config.distinct || uniqueDigits.length > 10) && attempts <= 50) {
+                return generatePuzzle(config, attempts + 1);
+            }
+
+            const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ".split('').sort(() => 0.5 - seededRandom());
+            gameState.letterMap = {}; gameState.reverseMap = {};
+            uniqueDigits.forEach((digit, index) => {
+                gameState.letterMap[letters[index]] = parseInt(digit);
+                gameState.reverseMap[digit] = letters[index];
+            });
+
+            gameState.puzzle = {
+                row1: n1.toString().split('').map(d => gameState.reverseMap[d]),
+                row2: n2.toString().split('').map(d => gameState.reverseMap[d]),
+                sum: sum.toString().split('').map(d => gameState.reverseMap[d])
+            };
+        }
+
+        function renderBoard() {
+            el.grid.innerHTML = '';
+            const digits = LEVELS[gameState.level] ? LEVELS[gameState.level].digits : 2;
+            el.grid.style.fontSize = digits > 4 ? '1.5rem' : '2.2rem';
+            const createRow = (arr, rowId) => {
+                const r = document.createElement('div'); r.className='number-row'; r.style.gridRow=rowId; 
+                arr.forEach(c => {
+                    const b=document.createElement('div'); b.className='char-box'; b.dataset.char=c; b.innerText=c;
+                    b.onclick=()=>selectLetter(c); r.appendChild(b);
+                }); return r;
+            };
+            el.grid.appendChild(createRow(gameState.puzzle.row1, 1));
+            const op=document.createElement('div'); op.className='operator-cell'; op.innerText='+'; el.grid.appendChild(op);
+            el.grid.appendChild(createRow(gameState.puzzle.row2, 2));
+            const l=document.createElement('div'); l.className='sum-line'; l.style.gridRow=3; el.grid.appendChild(l);
+            el.grid.appendChild(createRow(gameState.puzzle.sum, 4));
+        }
+
+        function selectLetter(char) {
+            if(gameState.isPaused) return;
+            if(gameState.guessedLetters[char]) return; 
+            gameState.selectedChar = char;
+            document.querySelectorAll('.char-box').forEach(b => {
+                b.classList.remove('selected');
+                if(b.dataset.char === char && !b.classList.contains('solved')) b.classList.add('selected');
+            });
+            el.msg.innerText = `Selected "${char}".`; el.msg.style.color = "var(--primary)";
+        }
+
+        function handleInput(digit, btn) {
+            if (gameState.isPaused) return;
+            if (!gameState.selectedChar) { showToast("Select a letter first!"); return; }
+            if(btn) { btn.style.transform = "scale(0.9)"; setTimeout(()=> btn.style.transform = "scale(1)", 100); }
+
+            if (digit === gameState.letterMap[gameState.selectedChar]) {
+                gameState.guessedLetters[gameState.selectedChar] = true;
+                const timeFactor = gameState.timeLeft / gameState.maxTime;
+                addScore(Math.round(100 + (50 * timeFactor)));
+                revealLetter(gameState.selectedChar, digit);
+                gameState.selectedChar = null;
+                el.msg.innerText = "Correct!"; el.msg.style.color = "var(--correct)";
+                checkWin();
+            } else {
+                addScore(-25);
+                if(btn) { btn.classList.add('shake'); setTimeout(() => btn.classList.remove('shake'), 300); }
+                el.msg.innerText = "Wrong!"; el.msg.style.color = "var(--wrong)";
+            }
+        }
+
+        function revealLetter(char, digit) {
+            document.querySelectorAll(`.char-box[data-char="${char}"]`).forEach(b => {
+                b.innerText = digit; b.classList.remove('selected'); b.classList.add('solved');
+            });
+        }
+
+        function checkWin() {
+            const needed = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
+            if (needed.every(c => gameState.guessedLetters[c])) {
+                clearInterval(gameState.timerInterval);
+                gameState.isTransitioning = true;
+                updateStats(gameState.score);
+                if (gameState.level < 5) gameState.level++; 
+                el.msg.innerText = "Level Complete!"; el.msg.style.color = "var(--correct)";
+                setTimeout(startLevel, 2000);
+            }
+        }
+
+        function failLevel() {
+            clearInterval(gameState.timerInterval);
+            gameState.isTransitioning = true;
+            alert("Time's Up! Difficulty lowered.");
+            if (gameState.level > 1) gameState.level--;
+            startLevel();
+        }
+
+        function addScore(amount) {
+            gameState.score = Math.max(0, gameState.score + amount);
+            gameState.sessionHistory.push(gameState.score);
+            updateStats(gameState.score);
+            updateUI();
+        }
+
+        function skipLevel() { if(!gameState.isPaused && checkCost(50)) { addScore(-50); startLevel(); } }
+        function useHint() {
+            if(gameState.isPaused || !checkCost(50)) return;
+            const unsolved = [...new Set([...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum])].filter(c => !gameState.guessedLetters[c]);
+            if(unsolved.length === 0) return;
+            addScore(-50);
+            const target = unsolved[0];
+            gameState.guessedLetters[target] = true;
+            revealLetter(target, gameState.letterMap[target]);
+            document.querySelectorAll(`.char-box[data-char="${target}"]`).forEach(b => b.classList.add('hinted'));
+            checkWin();
+        }
+        function checkCost(cost) { if(gameState.score < cost) { showToast(`Need ${cost} pts!`); return false; } return true; }
+
+        function startTimer() {
+            gameState.timerInterval = setInterval(() => {
+                if (gameState.isPaused) return;
+                gameState.timeLeft--;
+                const pct = Math.max(0, gameState.timeLeft / gameState.maxTime);
+                el.timerPath.style.strokeDashoffset = 126 - (126 * pct);
+                el.timerPath.style.stroke = pct < 0.25 ? "var(--wrong)" : "var(--accent)";
+                if (gameState.timeLeft <= 0) failLevel();
+            }, 1000);
+        }
+
+        function updateUI() {
+            el.score.innerText = gameState.score;
+        }
+
+        // --- Stats & Persistence ---
+        function loadData() {
+            const saved = localStorage.getItem('sumPuzzle_stats_v11');
+            if (saved) gameState.stats = { ...gameState.stats, ...JSON.parse(saved) };
+            updateStatsUI();
+        }
+        function saveData() { localStorage.setItem('sumPuzzle_stats_v11', JSON.stringify(gameState.stats)); }
+        
+        function updateStats(newScore) {
+            if (newScore > gameState.stats.highScore) {
+                const now = new Date();
+                gameState.stats.highScore = newScore;
+                gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
+                gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate });
+                if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
+            }
+            if (gameState.level > gameState.stats.maxLevel) gameState.stats.maxLevel = gameState.level;
+            saveData();
+            updateStatsUI();
+        }
+        function updateSessionTime() {
+            const sec = (Date.now() - gameState.sessionStartTime) / 1000;
+            if (sec > gameState.stats.longestSession) { gameState.stats.longestSession = sec; saveData(); updateStatsUI(); }
+        }
+        function updateStatsUI() {
+            el.highScore.innerText = `Best: ${gameState.stats.highScore}`;
+            el.statMaxLvl.innerText = gameState.stats.maxLevel;
+            el.statLongestTime.innerText = Math.floor(gameState.stats.longestSession / 60) + "m";
+        }
+
+        // --- Social & PHP ---
+        async function shareScore() {
+            let squares = gameState.score > 1000 ? "🟩🟩🟩" : (gameState.score > 500 ? "🟩🟩🟨" : "🟩🟨⬜");
+            const text = `SumPuzzle Daily #${dailyGameId} 🧠\nScore: ${gameState.score}\n${squares}\n\nPlay: https://mediamaze.com/SP/`;
+            if (navigator.share) { try { await navigator.share({ title: 'SumPuzzle', text: text }); } catch(e){} } 
+            else { navigator.clipboard.writeText(text); showToast("Result copied!"); }
+        }
+
+        const API_URL = 'score_api.php'; 
+        function openSubmitModal() { el.modals.submit.style.display = 'flex'; }
+        function submitScoreToPHP() {
+            const name = document.getElementById('playerName').value.trim();
+            if(!name) { alert("Enter name"); return; }
+            const payload = new URLSearchParams();
+            payload.append('action', 'submit'); payload.append('name', name);
+            payload.append('score', gameState.score); payload.append('level', gameState.stats.maxLevel);
+            fetch(API_URL, { method: 'POST', body: payload }).then(res=>res.json()).then(data=>{
+                if(data.status==='success') { el.modals.submit.style.display='none'; showToast("Submitted!"); openMenu('leaderboard'); }
+                else alert(data.message);
+            });
+        }
+        function fetchLeaderboard() {
+            const lbDiv = document.getElementById('lbTable'); document.getElementById('lbLoading').style.display = 'block'; lbDiv.innerHTML = '';
+            fetch(API_URL + '?action=get').then(res=>res.json()).then(data=>{
+                document.getElementById('lbLoading').style.display = 'none';
+                let html = '<tr><th>#</th><th>Name</th><th>Lvl</th><th style="text-align:right">Score</th></tr>';
+                data.forEach((row,i) => {
+                    let icon = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1));
+                    html += `<tr><td class="lb-rank">${icon}</td><td>${row.name}</td><td>${row.level}</td><td class="lb-score">${row.score}</td></tr>`;
+                });
+                lbDiv.innerHTML = html;
+            });
+        }
+
+        // --- Utils ---
+        function showToast(text) { el.toast.innerText=text; el.toast.classList.add('show'); setTimeout(()=>el.toast.classList.remove('show'),2000); }
+        function setupNumpad() { for(let i=0; i<=9; i++) { const b=document.createElement('button'); b.className='num-btn'; b.innerText=i; b.onclick=()=>handleInput(i,b); el.numpad.appendChild(b); } }
+        function setupKeyboard() { document.addEventListener('keydown', e => { if(e.key>='0'&&e.key<='9') { const b=[...document.querySelectorAll('.num-btn')].find(x=>x.innerText===e.key); handleInput(parseInt(e.key),b); } }); }
+        function closeIntro() { if(document.getElementById('dontShowAgain').checked) localStorage.setItem('sumPuzzle_skipIntro', 'true'); el.modals.intro.style.display='none'; gameState.isPaused=false; startLevel(); }
+        function openMenu(tab) { gameState.isPaused=true; updateSessionTime(); el.modals.menu.style.display='flex'; switchTab(tab); if(tab==='status') togglePerfChart('session'); }
+        function resumeGame() { el.modals.menu.style.display='none'; gameState.isPaused=false; }
+        function switchTab(t) { document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active')); document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active'); document.getElementById(t).classList.add('active'); if(t==='leaderboard') fetchLeaderboard(); }
+        function setupTabs() { document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>switchTab(t.dataset.tab))); }
+        function togglePerfChart(type) {
+            document.getElementById('subTabSession').classList.remove('active'); document.getElementById('subTabHistory').classList.remove('active');
+            document.getElementById('sessionChart').style.display='none'; document.getElementById('historyChart').style.display='none';
+            if(type==='session') { document.getElementById('subTabSession').classList.add('active'); document.getElementById('sessionChart').style.display='block'; drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7'); }
+            else { document.getElementById('subTabHistory').classList.add('active'); document.getElementById('historyChart').style.display='block'; drawChart(el.historyChart, gameState.stats.historyScores.map(x=>x.score), '#00CEC9'); }
+        }
+        function drawChart(c,data,color) {
+            const ctx=c.getContext('2d'); c.width=c.clientWidth; c.height=c.clientHeight; ctx.clearRect(0,0,c.width,c.height);
+            if(data.length<1) { ctx.fillStyle="#b2bec3"; ctx.font="12px sans-serif"; ctx.textAlign="center"; ctx.fillText("No data yet", c.width/2,c.height/2); return; }
+            const max=Math.max(...data,100), step=c.width/Math.max(data.length-1,1);
+            ctx.beginPath(); data.forEach((p,i)=>{ const x=i*step, y=c.height-((p/max)*(c.height*0.7))-10; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+            ctx.strokeStyle=color; ctx.lineWidth=3; ctx.stroke(); ctx.lineTo(c.width,c.height); ctx.lineTo(0,c.height);
+            const g=ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0,color.replace(')',',0.2)').replace('#','rgba(')); g.addColorStop(1,'white'); ctx.fillStyle=g; ctx.fill();
+        }
+
+        init();
+    </script>
+</body>
+</html>
