@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SumPuzzle - V2</title>
+    <title>SumPuzzle V4</title>
     <style>
         :root {
             --primary: #6C5CE7;
@@ -26,10 +26,9 @@
             align-items: center;
             min-height: 100vh;
             color: var(--dark);
-            user-select: none; /* Prevent text selection */
+            user-select: none;
         }
 
-        /* --- Layout --- */
         .game-container {
             background: white;
             padding: 2rem;
@@ -40,18 +39,15 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            position: relative;
         }
 
         /* --- Header --- */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        .header { display: flex; justify-content: space-between; align-items: center; }
         .score-box { display: flex; flex-direction: column; }
-        .score-label { font-size: 0.8rem; color: #636e72; text-transform: uppercase; letter-spacing: 1px; }
+        .score-label { font-size: 0.7rem; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; }
         .score-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .high-score { font-size: 0.75rem; color: #636e72; margin-top: 2px; }
         .level-badge { background: var(--light); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
 
         /* Timer */
@@ -60,7 +56,7 @@
         .timer-circle { fill: none; stroke: var(--light); stroke-width: 5; }
         .timer-path { fill: none; stroke: var(--accent); stroke-width: 5; stroke-dasharray: 126; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
 
-        /* --- The Puzzle Board (Grid Layout) --- */
+        /* --- Board --- */
         .board-container {
             background: var(--bg);
             padding: 1.5rem;
@@ -71,157 +67,66 @@
 
         .math-grid {
             display: grid;
-            grid-template-columns: auto 1fr; /* Operator column, Numbers column */
+            grid-template-columns: auto 1fr;
             gap: 5px 15px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 2.5rem;
             font-weight: bold;
         }
 
-        .operator-cell {
-            grid-column: 1;
-            grid-row: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-        }
+        .operator-cell { grid-column: 1; grid-row: 2; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+        .number-row { grid-column: 2; display: flex; justify-content: flex-end; gap: 8px; }
+        .sum-line { grid-column: 1 / span 2; height: 4px; background: var(--dark); border-radius: 2px; margin: 5px 0; }
 
-        .number-row {
-            grid-column: 2;
-            display: flex;
-            justify-content: flex-end; /* Right align numbers */
-            gap: 8px; /* Space between digits */
-        }
-
-        .sum-line {
-            grid-column: 1 / span 2;
-            height: 4px;
-            background: var(--dark);
-            border-radius: 2px;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
-
-        /* The individual letter/digit boxes */
         .char-box {
-            width: 45px;
-            height: 55px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: white;
-            border-radius: 8px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            width: 45px; height: 55px;
+            display: flex; justify-content: center; align-items: center;
+            background: white; border-radius: 8px; border: 2px solid transparent;
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-
         .char-box:hover { transform: translateY(-2px); border-color: var(--light); }
-        
-        /* Selected State */
-        .char-box.selected {
-            background-color: var(--select);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(116, 185, 255, 0.4);
-        }
-
-        /* Solved State */
-        .char-box.solved {
-            background-color: transparent;
-            color: var(--correct);
-            font-weight: 900;
-            box-shadow: none;
-            cursor: default;
-        }
-        
+        .char-box.selected { background-color: var(--select); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(116, 185, 255, 0.4); }
+        .char-box.solved { background-color: transparent; color: var(--correct); font-weight: 900; box-shadow: none; cursor: default; }
         .char-box.hinted { color: var(--secondary); }
 
-        /* --- Instruction Text --- */
-        .instruction {
-            text-align: center;
-            color: #636e72;
-            font-size: 0.9rem;
-            min-height: 1.2rem;
-            font-weight: 500;
-        }
+        .instruction { text-align: center; color: #636e72; font-size: 0.9rem; min-height: 1.2rem; font-weight: 500; }
 
-        /* --- Numpad Controls --- */
-        .controls {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-        }
-
+        /* --- Controls --- */
+        .controls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
         .num-btn {
-            background: white;
-            border: 2px solid var(--light);
-            border-radius: 10px;
-            padding: 15px 0;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.1s;
-            color: var(--dark);
+            background: white; border: 2px solid var(--light); border-radius: 10px;
+            padding: 15px 0; font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            transition: all 0.1s; color: var(--dark);
         }
-
         .num-btn:active { transform: scale(0.95); }
         .num-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-        /* --- Footer Actions --- */
-        .action-bar {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .top-actions {
-            grid-column: 1 / span 2;
-            display: flex;
-            justify-content: space-between;
-        }
-
+        /* --- Footer --- */
+        .action-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .top-actions { grid-column: 1 / span 2; display: flex; justify-content: space-between; }
         .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: #636e72;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px;
-            border-radius: 5px;
+            background: none; border: none; cursor: pointer; font-size: 0.9rem;
+            color: #636e72; transition: all 0.2s; display: flex; align-items: center;
+            gap: 5px; padding: 8px; border-radius: 5px;
         }
         .icon-btn:hover { background: var(--light); color: var(--dark); }
+        /* Removed disabled styling as per request */
         
         .skip-btn { color: var(--wrong); }
         .hint-btn { color: var(--secondary); }
+        .share-btn { width: 100%; margin-top: 10px; background: var(--primary); color: white; justify-content: center; }
+        .share-btn:hover { background: #5649c0; color: white; }
 
-        /* --- Modals --- */
+        /* --- Modals & Toasts --- */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); display: none;
+            justify-content: center; align-items: center; z-index: 100;
             backdrop-filter: blur(4px);
         }
-
-        .modal {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            width: 85%;
-            max-width: 400px;
-            animation: slideUp 0.3s ease;
-        }
+        .modal { background: white; padding: 2rem; border-radius: 15px; width: 85%; max-width: 400px; animation: slideUp 0.3s ease; }
+        
+        .intro-img { width: 100%; height: 120px; background: var(--light); border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary); }
 
         .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 1rem; }
         .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
@@ -229,26 +134,45 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .rules-list li { margin-bottom: 8px; font-size: 0.95rem; }
-        
+
+        .checkbox-container { display: flex; align-items: center; margin-top: 15px; font-size: 0.9rem; color: #636e72; }
+        .checkbox-container input { margin-right: 10px; transform: scale(1.2); }
+
         canvas { width: 100%; height: 150px; background: var(--bg); border-radius: 8px; margin-top: 10px; }
 
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+        /* Toast Popup for Errors */
+        .toast {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 200;
         }
-        .shake { animation: shake 0.3s; border-color: var(--wrong); color: var(--wrong); }
+        .toast.show { opacity: 1; }
 
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .shake { animation: shake 0.3s; border-color: var(--wrong); color: var(--wrong); }
     </style>
 </head>
 <body>
 
     <div class="game-container">
+        <div id="toast" class="toast">Not enough points!</div>
+
         <div class="header">
             <div class="score-box">
                 <span class="score-label">Score</span>
                 <span class="score-value" id="scoreDisplay">0</span>
+                <span class="high-score" id="highScoreDisplay">Best: 0</span>
             </div>
             
             <div class="level-badge" id="levelDisplay">Level 1</div>
@@ -262,20 +186,17 @@
         </div>
 
         <div class="board-container">
-            <div class="math-grid" id="mathGrid">
-                </div>
+            <div class="math-grid" id="mathGrid"></div>
         </div>
 
-        <div class="instruction" id="messageArea">
-            Select a letter above, then guess a number.
-        </div>
+        <div class="instruction" id="messageArea">Select a letter, then guess a number.</div>
 
         <div class="controls" id="numpad"></div>
 
         <div class="action-bar">
             <div class="top-actions">
                 <button class="icon-btn" id="rulesBtn"><span>?</span> Rules</button>
-                <button class="icon-btn" id="statsBtn"><span>📊</span> Pause</button>
+                <button class="icon-btn" id="statsBtn"><span>📊</span> Menu</button>
             </div>
             <div class="top-actions" style="margin-top:10px; border-top: 1px solid var(--light); padding-top:10px;">
                 <button class="icon-btn skip-btn" id="skipBtn"><span>⏩</span> Skip (-50)</button>
@@ -284,53 +205,58 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="rulesModal">
+    <div class="modal-overlay" id="introModal" style="z-index: 200;">
         <div class="modal">
-            <div class="tabs">
-                <div class="tab active" data-tab="rules">Rules</div>
-                <div class="tab" data-tab="score">Score</div>
-                <div class="tab" data-tab="about">About</div>
-            </div>
+            <div class="intro-img">A + B = C</div>
+            <h2 style="margin-top:0; text-align:center;">Welcome to SumPuzzle</h2>
+            <p style="color:#636e72;">Crack the code! Letters represent hidden digits.</p>
+            <ul class="rules-list">
+                <li>👆 <strong>Click</strong> a letter to select it.</li>
+                <li>🔢 <strong>Guess</strong> the number (or type 0-9).</li>
+                <li>🧠 <strong>Solve</strong> the math before time runs out.</li>
+            </ul>
+            <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeIntro()">Start Game</button>
             
-            <div id="rules" class="tab-content active">
-                <h3>How to Play</h3>
-                <ul class="rules-list">
-                    <li><strong>Click a letter</strong> on the board to select it.</li>
-                    <li><strong>Click a number</strong> to guess its value.</li>
-                    <li>Every letter represents a unique digit (0-9).</li>
-                    <li>Solve the addition problem before time runs out!</li>
-                    <li><strong>Skip:</strong> Stuck? Get a new puzzle for a score cost.</li>
-                </ul>
-                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeModals()">Play</button>
-            </div>
-
-            <div id="score" class="tab-content">
-                <h3>Scoring System</h3>
-                <ul class="rules-list">
-                    <li><strong>Correct:</strong> +100 Base Points.</li>
-                    <li><strong>Speed Bonus:</strong> Faster = More points.</li>
-                    <li><strong>Penalty:</strong> Wrong guess reduces score (-25).</li>
-                    <li><strong>Hint/Skip:</strong> Costs 50 points.</li>
-                    <li><strong>Win/Fail:</strong> Affects difficulty level.</li>
-                </ul>
-                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeModals()">Close</button>
-            </div>
-
-            <div id="about" class="tab-content">
-                <h3>SumPuzzle</h3>
-                <p>Created to challenge your logical arithmetic skills.</p>
-                <a href="https://tonynahra.github.io" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration: none;">tonynahra.github.io</a>
-                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="closeModals()">Close</button>
+            <div class="checkbox-container">
+                <input type="checkbox" id="dontShowAgain">
+                <label for="dontShowAgain">Don't show this again</label>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="pauseModal">
+    <div class="modal-overlay" id="menuModal">
         <div class="modal">
-            <h3 style="text-align: center;">Game Paused</h3>
-            <p style="text-align: center; color:#636e72;">Score History</p>
-            <canvas id="scoreChart"></canvas>
-            <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--correct); color:white; border:none;" id="resumeBtn">Resume Game</button>
+            <div class="tabs">
+                <div class="tab active" data-tab="status">Status</div>
+                <div class="tab" data-tab="rules">Rules</div>
+                <div class="tab" data-tab="about">About</div>
+            </div>
+
+            <div id="status" class="tab-content active">
+                <h3 style="text-align: center; margin-top:0;">Score Progress</h3>
+                <p style="text-align:center; font-size:0.8rem; color:#636e72;">Current Session History</p>
+                <canvas id="scoreChart"></canvas>
+                <button class="icon-btn share-btn" onclick="shareScore()">📤 Share Score</button>
+                <button class="num-btn" style="width:100%; margin-top:10px; background:var(--correct); color:white; border:none;" onclick="resumeGame()">Resume</button>
+            </div>
+            
+            <div id="rules" class="tab-content">
+                <h3>Rules & Scoring</h3>
+                <ul class="rules-list">
+                    <li><strong>Correct:</strong> +100 Base Points + Speed Bonus.</li>
+                    <li><strong>Penalty:</strong> Wrong guess (-25).</li>
+                    <li><strong>Skip/Hint:</strong> Costs 50 points.</li>
+                    <li><strong>Levels:</strong> Win to increase difficulty.</li>
+                </ul>
+                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="switchTab('status')">Back</button>
+            </div>
+
+            <div id="about" class="tab-content">
+                <h3>SumPuzzle V4</h3>
+                <p>Created to challenge your logical arithmetic skills.</p>
+                <a href="https://tonynahra.github.io" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration: none;">tonynahra.github.io</a>
+                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="switchTab('status')">Back</button>
+            </div>
         </div>
     </div>
 
@@ -338,6 +264,7 @@
         // --- Game State ---
         const gameState = {
             score: 0,
+            highScoreObj: { value: 0, date: '-' },
             level: 1,
             timeLeft: 0,
             maxTime: 60,
@@ -346,9 +273,9 @@
             letterMap: {}, 
             reverseMap: {}, 
             guessedLetters: {}, 
-            selectedChar: null, // The letter currently selected by user
-            scoreHistory: [0],
-            isPaused: false,
+            selectedChar: null,
+            scoreHistory: [0], // For chart
+            isPaused: true,
             isTransitioning: false
         };
 
@@ -361,28 +288,72 @@
         // --- DOM Elements ---
         const el = {
             score: document.getElementById('scoreDisplay'),
+            highScore: document.getElementById('highScoreDisplay'),
             level: document.getElementById('levelDisplay'),
             grid: document.getElementById('mathGrid'),
             numpad: document.getElementById('numpad'),
             timerPath: document.getElementById('timerPath'),
             msg: document.getElementById('messageArea'),
             chart: document.getElementById('scoreChart'),
+            toast: document.getElementById('toast'),
             modals: {
-                rules: document.getElementById('rulesModal'),
-                pause: document.getElementById('pauseModal')
+                intro: document.getElementById('introModal'),
+                menu: document.getElementById('menuModal')
             }
         };
 
         function init() {
             setupNumpad();
             setupTabs();
-            startLevel();
+            setupKeyboard();
+            loadHighScore();
             
-            document.getElementById('rulesBtn').onclick = () => showModal('rules');
-            document.getElementById('statsBtn').onclick = pauseGame;
-            document.getElementById('resumeBtn').onclick = resumeGame;
+            // Intro Logic
+            const skipIntro = localStorage.getItem('sumPuzzle_skipIntro');
+            if(skipIntro === 'true') {
+                gameState.isPaused = false;
+                startLevel();
+            } else {
+                el.modals.intro.style.display = 'flex';
+            }
+            
+            // Buttons
+            document.getElementById('rulesBtn').onclick = () => openMenu('rules');
+            document.getElementById('statsBtn').onclick = () => openMenu('status');
             document.getElementById('hintBtn').onclick = useHint;
             document.getElementById('skipBtn').onclick = skipLevel;
+        }
+
+        // --- High Score Logic ---
+        function loadHighScore() {
+            const saved = localStorage.getItem('sumPuzzle_highScoreData');
+            if (saved) {
+                gameState.highScoreObj = JSON.parse(saved);
+            }
+            updateHighScoreUI();
+        }
+
+        function saveHighScore() {
+            if (gameState.score > gameState.highScoreObj.value) {
+                const now = new Date();
+                // Format: MM/DD
+                const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
+                
+                gameState.highScoreObj = {
+                    value: gameState.score,
+                    date: dateStr
+                };
+                localStorage.setItem('sumPuzzle_highScoreData', JSON.stringify(gameState.highScoreObj));
+                updateHighScoreUI();
+            }
+        }
+
+        function updateHighScoreUI() {
+            if (gameState.highScoreObj.value > 0) {
+                el.highScore.innerText = `Best: ${gameState.highScoreObj.value} (${gameState.highScoreObj.date})`;
+            } else {
+                el.highScore.innerText = `Best: 0`;
+            }
         }
 
         function setupNumpad() {
@@ -396,7 +367,28 @@
             }
         }
 
-        // --- Game Logic ---
+        function setupKeyboard() {
+            document.addEventListener('keydown', (e) => {
+                const key = e.key;
+                if(key >= '0' && key <= '9') {
+                    const btns = Array.from(document.querySelectorAll('.num-btn'));
+                    const targetBtn = btns.find(b => b.innerText === key);
+                    handleInput(parseInt(key), targetBtn);
+                }
+            });
+        }
+
+        function closeIntro() {
+            const checkbox = document.getElementById('dontShowAgain');
+            if(checkbox.checked) {
+                localStorage.setItem('sumPuzzle_skipIntro', 'true');
+            }
+            el.modals.intro.style.display = 'none';
+            gameState.isPaused = false;
+            startLevel();
+        }
+
+        // --- Game Core ---
 
         function startLevel() {
             clearInterval(gameState.timerInterval);
@@ -418,11 +410,7 @@
         }
 
         function generatePuzzle(config, attempts = 0) {
-            // Safety break to prevent infinite loops
-            if(attempts > 50) {
-                console.warn("Could not generate perfect puzzle, relaxing constraints.");
-                config.distinct = Math.max(3, config.distinct - 1);
-            }
+            if(attempts > 50) config.distinct = Math.max(3, config.distinct - 1);
 
             const min = Math.pow(10, config.digits - 1);
             const max = Math.pow(10, config.digits) - 1;
@@ -434,13 +422,10 @@
             const allStr = `${n1}${n2}${sum}`;
             const uniqueDigits = [...new Set(allStr.split(''))];
 
-            // If not enough unique digits (too easy) or too many (impossible), retry
-            // Note: max 10 digits 0-9 allowed.
             if ((uniqueDigits.length < config.distinct || uniqueDigits.length > 10) && attempts <= 50) {
                 return generatePuzzle(config, attempts + 1);
             }
 
-            // Map Digits to Letters
             const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ".split('').sort(() => 0.5 - Math.random());
             gameState.letterMap = {};
             gameState.reverseMap = {};
@@ -460,14 +445,10 @@
 
         function renderBoard() {
             el.grid.innerHTML = '';
-            
-            // Helper to create row html
             const createRow = (arr, rowId) => {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'number-row';
-                // Grid row positions
                 rowDiv.style.gridRow = rowId; 
-                
                 arr.forEach(char => {
                     const box = document.createElement('div');
                     box.className = 'char-box';
@@ -479,43 +460,29 @@
                 return rowDiv;
             };
 
-            // 1. Top Number
             el.grid.appendChild(createRow(gameState.puzzle.row1, 1));
-
-            // 2. Operator
             const op = document.createElement('div');
-            op.className = 'operator-cell';
-            op.innerText = '+';
+            op.className = 'operator-cell'; op.innerText = '+';
             el.grid.appendChild(op);
-
-            // 3. Second Number
             el.grid.appendChild(createRow(gameState.puzzle.row2, 2));
-
-            // 4. Line
             const line = document.createElement('div');
-            line.className = 'sum-line';
-            line.style.gridRow = 3;
+            line.className = 'sum-line'; line.style.gridRow = 3;
             el.grid.appendChild(line);
-
-            // 5. Result
             el.grid.appendChild(createRow(gameState.puzzle.sum, 4));
         }
 
         function selectLetter(char) {
             if(gameState.isPaused || gameState.isTransitioning) return;
-            if(gameState.guessedLetters[char]) return; // Already solved
+            if(gameState.guessedLetters[char]) return; 
 
             gameState.selectedChar = char;
-            
-            // Update Visuals
             document.querySelectorAll('.char-box').forEach(box => {
                 box.classList.remove('selected');
                 if(box.dataset.char === char && !box.classList.contains('solved')) {
                     box.classList.add('selected');
                 }
             });
-
-            el.msg.innerText = `Selected "${char}". Now click a number below.`;
+            el.msg.innerText = `Selected "${char}". Type or click a number.`;
             el.msg.style.color = "var(--primary)";
         }
 
@@ -523,35 +490,33 @@
             if (gameState.isPaused || gameState.isTransitioning) return;
 
             if (!gameState.selectedChar) {
-                el.msg.innerText = "Please select a letter on the board first!";
-                el.msg.style.color = "var(--wrong)";
-                shakeElement(el.msg);
+                showToast("Select a letter first!");
                 return;
+            }
+
+            if(btnElement) {
+                btnElement.style.transform = "scale(0.9)";
+                setTimeout(()=> btnElement.style.transform = "scale(1)", 100);
             }
 
             const correctDigit = gameState.letterMap[gameState.selectedChar];
 
             if (digit === correctDigit) {
-                // Correct
                 gameState.guessedLetters[gameState.selectedChar] = true;
-                
-                // Score Math
                 const timeFactor = gameState.timeLeft / gameState.maxTime;
-                const points = Math.round(100 + (50 * timeFactor));
-                addScore(points);
+                addScore(Math.round(100 + (50 * timeFactor)));
                 
                 revealLetter(gameState.selectedChar, digit);
-                gameState.selectedChar = null; // Clear selection
+                gameState.selectedChar = null;
                 el.msg.innerText = "Correct! Select next letter.";
                 el.msg.style.color = "var(--correct)";
-                
                 checkWin();
-                
             } else {
-                // Wrong
                 addScore(-25);
-                btnElement.classList.add('shake');
-                setTimeout(() => btnElement.classList.remove('shake'), 300);
+                if(btnElement) {
+                    btnElement.classList.add('shake');
+                    setTimeout(() => btnElement.classList.remove('shake'), 300);
+                }
                 el.msg.innerText = "Wrong number!";
                 el.msg.style.color = "var(--wrong)";
             }
@@ -567,28 +532,18 @@
         }
 
         function checkWin() {
-            // Check if all needed letters are guessed
             const needed = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
             const allSolved = needed.every(c => gameState.guessedLetters[c]);
-
-            if (allSolved) {
-                levelComplete();
-            }
+            if (allSolved) levelComplete();
         }
 
         function levelComplete() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = true;
-            
             if (gameState.level < 3) gameState.level++;
-            
             el.msg.innerText = "Level Complete! Next level coming...";
             el.msg.style.color = "var(--correct)";
-            
-            // Wait 2 seconds then start
-            setTimeout(() => {
-                startLevel();
-            }, 2000);
+            setTimeout(() => startLevel(), 2000);
         }
 
         function failLevel() {
@@ -599,10 +554,22 @@
             startLevel();
         }
 
+        // --- Skip / Hint Logic with Popups ---
+        
+        function showToast(text) {
+            el.toast.innerText = text;
+            el.toast.classList.add('show');
+            shakeElement(el.toast);
+            setTimeout(() => {
+                el.toast.classList.remove('show');
+            }, 2000);
+        }
+
         function skipLevel() {
             if(gameState.isPaused || gameState.isTransitioning) return;
+            
             if(gameState.score < 50) {
-                 alert("Not enough score to skip!");
+                 showToast("Need 50 points to skip!");
                  return;
             }
             addScore(-50);
@@ -611,8 +578,11 @@
 
         function useHint() {
             if(gameState.isPaused || gameState.isTransitioning) return;
-            
-            // Find an unsolved letter
+            if(gameState.score < 50) {
+                 showToast("Need 50 points for a hint!");
+                 return;
+            }
+
             const allChars = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
             const unsolved = [...new Set(allChars)].filter(c => !gameState.guessedLetters[c]);
             
@@ -624,38 +594,31 @@
             
             gameState.guessedLetters[target] = true;
             revealLetter(target, val);
-            
-            // Visual hint style
             document.querySelectorAll(`.char-box[data-char="${target}"]`).forEach(b => b.classList.add('hinted'));
-            
             checkWin();
         }
 
         function addScore(amount) {
             gameState.score += amount;
             if (gameState.score < 0) gameState.score = 0;
+            
             gameState.scoreHistory.push(gameState.score);
+            saveHighScore(); // Check and save if new best
             updateUI();
         }
 
         function startTimer() {
             const pathLength = 126;
-            
             gameState.timerInterval = setInterval(() => {
                 if (gameState.isPaused) return;
 
                 gameState.timeLeft--;
-                
                 const percentage = Math.max(0, gameState.timeLeft / gameState.maxTime);
-                const dashOffset = pathLength - (pathLength * percentage);
-                el.timerPath.style.strokeDashoffset = dashOffset;
+                el.timerPath.style.strokeDashoffset = pathLength - (pathLength * percentage);
                 
-                if (percentage < 0.25) el.timerPath.style.stroke = "var(--wrong)";
-                else el.timerPath.style.stroke = "var(--accent)";
+                el.timerPath.style.stroke = percentage < 0.25 ? "var(--wrong)" : "var(--accent)";
 
-                if (gameState.timeLeft <= 0) {
-                    failLevel();
-                }
+                if (gameState.timeLeft <= 0) failLevel();
             }, 1000);
         }
 
@@ -665,101 +628,96 @@
         }
 
         function shakeElement(elem) {
-            elem.style.transform = "translateX(5px)";
-            setTimeout(() => elem.style.transform = "translateX(-5px)", 100);
-            setTimeout(() => elem.style.transform = "translateX(0)", 200);
+            elem.classList.add('shake');
+            setTimeout(() => elem.classList.remove('shake'), 300);
         }
 
-        // --- Modals & Charts ---
+        // --- Menu System ---
 
-        function showModal(id) {
-            el.modals[id].style.display = 'flex';
-            if (id === 'rules') gameState.isPaused = true;
-        }
+        function openMenu(tabName) {
+            gameState.isPaused = true;
+            el.modals.menu.style.display = 'flex';
+            
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
 
-        function closeModals() {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-            if (gameState.isPaused && !el.modals.pause.style.display === 'flex') {
-                gameState.isPaused = false;
+            if(tabName === 'status') {
+                setTimeout(drawChart, 50);
             }
+        }
+        
+        function switchTab(tabName) {
+             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+             document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+             document.getElementById(tabName).classList.add('active');
+             if(tabName === 'status') setTimeout(drawChart, 50);
+        }
+
+        function resumeGame() {
+            el.modals.menu.style.display = 'none';
+            gameState.isPaused = false;
         }
 
         function setupTabs() {
             document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.getElementById(tab.dataset.tab).classList.add('active');
-                });
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
             });
         }
 
-        function pauseGame() {
-            gameState.isPaused = true;
-            setTimeout(drawChart, 100); // Small delay to ensure modal renders
-            showModal('pause');
-        }
-
-        function resumeGame() {
-            gameState.isPaused = false;
-            closeModals();
+        async function shareScore() {
+            const text = `I scored ${gameState.score} in SumPuzzle! Can you beat me?`;
+            if (navigator.share) {
+                try { await navigator.share({ title: 'SumPuzzle Score', text: text, url: window.location.href }); } 
+                catch (err) { console.log('Share failed', err); }
+            } else {
+                navigator.clipboard.writeText(`${text} ${window.location.href}`);
+                showToast("Score copied!");
+            }
         }
 
         function drawChart() {
             const ctx = el.chart.getContext('2d');
-            // Explicitly set width/height to internal pixel size to prevent blur
             el.chart.width = el.chart.clientWidth;
             el.chart.height = el.chart.clientHeight;
-            
             const w = el.chart.width;
             const h = el.chart.height;
             const data = gameState.scoreHistory;
 
             ctx.clearRect(0,0,w,h);
-            
-            // Draw background grid
-            ctx.strokeStyle = '#eee';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
-            ctx.stroke();
 
-            if (data.length < 1) return;
+            const hasData = data.some(val => val > 0);
+            if(!hasData && data.length <= 1) {
+                ctx.fillStyle = "#b2bec3";
+                ctx.font = "bold 14px 'Segoe UI'";
+                ctx.textAlign = "center";
+                ctx.fillText("Start playing to see your stats!", w/2, h/2);
+                return;
+            }
 
-            // Scale calculations
-            const maxVal = Math.max(...data, 100); // Minimum scale 100
+            const maxVal = Math.max(...data, 100);
             const stepX = w / Math.max(data.length - 1, 1);
             
             ctx.beginPath();
-            
             data.forEach((point, i) => {
                 const x = i * stepX;
-                // Invert Y axis (canvas 0 is top)
                 const y = h - ((point / maxVal) * (h * 0.8)) - 10; 
-                
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
             
-            ctx.strokeStyle = '#6C5CE7';
-            ctx.lineWidth = 3;
-            ctx.lineJoin = 'round';
-            ctx.stroke();
-
-            // Gradient fill under line
-            ctx.lineTo(w, h);
-            ctx.lineTo(0, h);
+            ctx.strokeStyle = '#6C5CE7'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
+            
+            ctx.lineTo(w, h); ctx.lineTo(0, h);
             const grad = ctx.createLinearGradient(0, 0, 0, h);
             grad.addColorStop(0, "rgba(108, 92, 231, 0.2)");
             grad.addColorStop(1, "rgba(108, 92, 231, 0)");
-            ctx.fillStyle = grad;
-            ctx.fill();
+            ctx.fillStyle = grad; ctx.fill();
         }
 
-        // Start
         init();
-
     </script>
 </body>
 </html>
