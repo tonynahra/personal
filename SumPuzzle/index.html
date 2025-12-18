@@ -2,8 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SumPuzzle V4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>SumPuzzle - Cognitive Math & Logic Game</title>
+    <meta name="description" content="Exercise your brain with SumPuzzle. A cryptarithmetic logic game designed to improve cognitive function, pattern recognition, and arithmetic speed over time.">
+    <meta name="keywords" content="math game, brain training, logic puzzle, cryptarithmetic, cognitive exercise, educational game, math puzzle">
+    <meta name="author" content="Tony Nahra">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tonynahra.github.io/sumpuzzle/">
+    <meta property="og:title" content="SumPuzzle - Train Your Brain">
+    <meta property="og:description" content="Crack the code where letters are numbers. Track your cognitive progress with detailed score history charts.">
+    <meta property="og:image" content="https://tonynahra.github.io/sumpuzzle/preview.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SumPuzzle - Cognitive Math Game">
+    <meta name="twitter:description" content="Improve your logical thinking and math skills. Track your high scores over time.">
+    <meta name="twitter:image" content="https://tonynahra.github.io/sumpuzzle/preview.jpg">
+
     <style>
         :root {
             --primary: #6C5CE7;
@@ -27,6 +43,7 @@
             min-height: 100vh;
             color: var(--dark);
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .game-container {
@@ -110,23 +127,30 @@
             gap: 5px; padding: 8px; border-radius: 5px;
         }
         .icon-btn:hover { background: var(--light); color: var(--dark); }
-        /* Removed disabled styling as per request */
         
         .skip-btn { color: var(--wrong); }
         .hint-btn { color: var(--secondary); }
         .share-btn { width: 100%; margin-top: 10px; background: var(--primary); color: white; justify-content: center; }
         .share-btn:hover { background: #5649c0; color: white; }
 
-        /* --- Modals & Toasts --- */
+        /* --- Modals --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); display: none;
             justify-content: center; align-items: center; z-index: 100;
             backdrop-filter: blur(4px);
         }
-        .modal { background: white; padding: 2rem; border-radius: 15px; width: 85%; max-width: 400px; animation: slideUp 0.3s ease; }
+        .modal { 
+            background: white; padding: 2rem; border-radius: 15px; width: 85%; max-width: 400px; 
+            max-height: 90vh; overflow-y: auto;
+            animation: slideUp 0.3s ease; position: relative;
+        }
         
-        .intro-img { width: 100%; height: 120px; background: var(--light); border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary); }
+        .intro-img { 
+            width: 100%; height: 120px; background: var(--light); border-radius: 8px; 
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: center; 
+            font-size: 3rem; color: var(--primary); font-weight: bold;
+        }
 
         .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 1rem; }
         .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
@@ -138,23 +162,19 @@
         .checkbox-container { display: flex; align-items: center; margin-top: 15px; font-size: 0.9rem; color: #636e72; }
         .checkbox-container input { margin-right: 10px; transform: scale(1.2); }
 
-        canvas { width: 100%; height: 150px; background: var(--bg); border-radius: 8px; margin-top: 10px; }
+        canvas { width: 100%; height: 120px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 15px; }
+        .chart-label { font-size: 0.8rem; font-weight: bold; color: #636e72; display: block; margin-top: 10px; }
 
-        /* Toast Popup for Errors */
+        /* Custom Alert Styling */
+        .alert-modal { text-align: center; }
+        .alert-title { font-size: 1.5rem; color: var(--wrong); margin-bottom: 10px; font-weight: bold; }
+        .alert-msg { font-size: 1rem; color: var(--dark); margin-bottom: 20px; }
+
+        /* Toast Popup */
         .toast {
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--dark);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 200;
+            position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+            background: var(--dark); color: white; padding: 10px 20px; border-radius: 20px;
+            font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200;
         }
         .toast.show { opacity: 1; }
 
@@ -166,7 +186,7 @@
 <body>
 
     <div class="game-container">
-        <div id="toast" class="toast">Not enough points!</div>
+        <div id="toast" class="toast">Notice</div>
 
         <div class="header">
             <div class="score-box">
@@ -207,20 +227,32 @@
 
     <div class="modal-overlay" id="introModal" style="z-index: 200;">
         <div class="modal">
-            <div class="intro-img">A + B = C</div>
-            <h2 style="margin-top:0; text-align:center;">Welcome to SumPuzzle</h2>
-            <p style="color:#636e72;">Crack the code! Letters represent hidden digits.</p>
-            <ul class="rules-list">
-                <li>👆 <strong>Click</strong> a letter to select it.</li>
-                <li>🔢 <strong>Guess</strong> the number (or type 0-9).</li>
-                <li>🧠 <strong>Solve</strong> the math before time runs out.</li>
+            <div class="intro-img">🧠</div>
+            <h2 style="margin-top:0; text-align:center;">Train Your Brain</h2>
+            <p style="color:#636e72; line-height: 1.5;">
+                Welcome to <strong>SumPuzzle</strong>. This game is designed to exercise your cognitive functions, pattern recognition, and arithmetic speed.
+            </p>
+            <div style="background:var(--bg); padding:10px; border-radius:8px; margin: 10px 0; font-size:0.9rem;">
+                <strong>Goal:</strong> Improve your high score over time. Consistent practice helps build mental agility!
+            </div>
+            <ul class="rules-list" style="color:#636e72;">
+                <li>Letters represent hidden digits (0-9).</li>
+                <li>Solve the equation before the timer runs out.</li>
+                <li>Track your "High Score History" in the menu.</li>
             </ul>
-            <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeIntro()">Start Game</button>
-            
+            <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeIntro()">Start Training</button>
             <div class="checkbox-container">
                 <input type="checkbox" id="dontShowAgain">
                 <label for="dontShowAgain">Don't show this again</label>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="alertModal" style="z-index: 300;">
+        <div class="modal alert-modal">
+            <div id="alertTitle" class="alert-title">Title</div>
+            <div id="alertMsg" class="alert-msg">Message goes here.</div>
+            <button class="num-btn" style="width:100%; background:var(--dark); color:white; border:none;" id="alertBtn">OK</button>
         </div>
     </div>
 
@@ -233,9 +265,14 @@
             </div>
 
             <div id="status" class="tab-content active">
-                <h3 style="text-align: center; margin-top:0;">Score Progress</h3>
-                <p style="text-align:center; font-size:0.8rem; color:#636e72;">Current Session History</p>
-                <canvas id="scoreChart"></canvas>
+                <h3 style="text-align: center; margin-top:0;">Performance</h3>
+                
+                <span class="chart-label">Current Session</span>
+                <canvas id="sessionChart"></canvas>
+                
+                <span class="chart-label">High Score History</span>
+                <canvas id="historyChart"></canvas>
+
                 <button class="icon-btn share-btn" onclick="shareScore()">📤 Share Score</button>
                 <button class="num-btn" style="width:100%; margin-top:10px; background:var(--correct); color:white; border:none;" onclick="resumeGame()">Resume</button>
             </div>
@@ -243,16 +280,16 @@
             <div id="rules" class="tab-content">
                 <h3>Rules & Scoring</h3>
                 <ul class="rules-list">
+                    <li><strong>Time:</strong> Lvl 1: 90s, Lvl 2: 180s, Lvl 3: 360s.</li>
                     <li><strong>Correct:</strong> +100 Base Points + Speed Bonus.</li>
                     <li><strong>Penalty:</strong> Wrong guess (-25).</li>
                     <li><strong>Skip/Hint:</strong> Costs 50 points.</li>
-                    <li><strong>Levels:</strong> Win to increase difficulty.</li>
                 </ul>
                 <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="switchTab('status')">Back</button>
             </div>
 
             <div id="about" class="tab-content">
-                <h3>SumPuzzle V4</h3>
+                <h3>SumPuzzle V6</h3>
                 <p>Created to challenge your logical arithmetic skills.</p>
                 <a href="https://tonynahra.github.io" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration: none;">tonynahra.github.io</a>
                 <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="switchTab('status')">Back</button>
@@ -261,10 +298,18 @@
     </div>
 
     <script>
+        // --- Config ---
+        const LEVELS = {
+            1: { digits: 2, distinct: 4, time: 90 },
+            2: { digits: 3, distinct: 6, time: 180 },
+            3: { digits: 4, distinct: 8, time: 360 }
+        };
+
         // --- Game State ---
         const gameState = {
             score: 0,
             highScoreObj: { value: 0, date: '-' },
+            historyData: [], 
             level: 1,
             timeLeft: 0,
             maxTime: 60,
@@ -274,15 +319,9 @@
             reverseMap: {}, 
             guessedLetters: {}, 
             selectedChar: null,
-            scoreHistory: [0], // For chart
+            sessionHistory: [0],
             isPaused: true,
             isTransitioning: false
-        };
-
-        const LEVELS = {
-            1: { digits: 2, distinct: 4, time: 60 },
-            2: { digits: 3, distinct: 6, time: 90 },
-            3: { digits: 4, distinct: 8, time: 120 }
         };
 
         // --- DOM Elements ---
@@ -294,11 +333,18 @@
             numpad: document.getElementById('numpad'),
             timerPath: document.getElementById('timerPath'),
             msg: document.getElementById('messageArea'),
-            chart: document.getElementById('scoreChart'),
+            sessionChart: document.getElementById('sessionChart'),
+            historyChart: document.getElementById('historyChart'),
             toast: document.getElementById('toast'),
             modals: {
                 intro: document.getElementById('introModal'),
-                menu: document.getElementById('menuModal')
+                menu: document.getElementById('menuModal'),
+                alert: document.getElementById('alertModal')
+            },
+            alert: {
+                title: document.getElementById('alertTitle'),
+                msg: document.getElementById('alertMsg'),
+                btn: document.getElementById('alertBtn')
             }
         };
 
@@ -306,9 +352,8 @@
             setupNumpad();
             setupTabs();
             setupKeyboard();
-            loadHighScore();
+            loadData();
             
-            // Intro Logic
             const skipIntro = localStorage.getItem('sumPuzzle_skipIntro');
             if(skipIntro === 'true') {
                 gameState.isPaused = false;
@@ -317,79 +362,54 @@
                 el.modals.intro.style.display = 'flex';
             }
             
-            // Buttons
             document.getElementById('rulesBtn').onclick = () => openMenu('rules');
             document.getElementById('statsBtn').onclick = () => openMenu('status');
             document.getElementById('hintBtn').onclick = useHint;
             document.getElementById('skipBtn').onclick = skipLevel;
         }
 
-        // --- High Score Logic ---
-        function loadHighScore() {
-            const saved = localStorage.getItem('sumPuzzle_highScoreData');
+        // --- Data Persistence ---
+        function loadData() {
+            const saved = localStorage.getItem('sumPuzzle_data_v5');
             if (saved) {
-                gameState.highScoreObj = JSON.parse(saved);
+                const data = JSON.parse(saved);
+                gameState.highScoreObj = data.highScoreObj || { value: 0, date: '-' };
+                gameState.historyData = data.historyData || [];
             }
             updateHighScoreUI();
         }
 
-        function saveHighScore() {
+        function saveData() {
+            const data = {
+                highScoreObj: gameState.highScoreObj,
+                historyData: gameState.historyData
+            };
+            localStorage.setItem('sumPuzzle_data_v5', JSON.stringify(data));
+        }
+
+        function recordHighScore() {
             if (gameState.score > gameState.highScoreObj.value) {
                 const now = new Date();
-                // Format: MM/DD
                 const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
                 
-                gameState.highScoreObj = {
-                    value: gameState.score,
-                    date: dateStr
-                };
-                localStorage.setItem('sumPuzzle_highScoreData', JSON.stringify(gameState.highScoreObj));
+                gameState.highScoreObj = { value: gameState.score, date: dateStr };
+                
+                // Add to history (limit to last 20)
+                gameState.historyData.push(gameState.score);
+                if(gameState.historyData.length > 20) gameState.historyData.shift();
+                
+                saveData();
                 updateHighScoreUI();
             }
         }
 
         function updateHighScoreUI() {
-            if (gameState.highScoreObj.value > 0) {
-                el.highScore.innerText = `Best: ${gameState.highScoreObj.value} (${gameState.highScoreObj.date})`;
-            } else {
-                el.highScore.innerText = `Best: 0`;
-            }
+            el.highScore.innerText = gameState.highScoreObj.value > 0 
+                ? `Best: ${gameState.highScoreObj.value}` 
+                : `Best: 0`;
         }
 
-        function setupNumpad() {
-            el.numpad.innerHTML = '';
-            for(let i=0; i<=9; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'num-btn';
-                btn.innerText = i;
-                btn.onclick = () => handleInput(i, btn);
-                el.numpad.appendChild(btn);
-            }
-        }
-
-        function setupKeyboard() {
-            document.addEventListener('keydown', (e) => {
-                const key = e.key;
-                if(key >= '0' && key <= '9') {
-                    const btns = Array.from(document.querySelectorAll('.num-btn'));
-                    const targetBtn = btns.find(b => b.innerText === key);
-                    handleInput(parseInt(key), targetBtn);
-                }
-            });
-        }
-
-        function closeIntro() {
-            const checkbox = document.getElementById('dontShowAgain');
-            if(checkbox.checked) {
-                localStorage.setItem('sumPuzzle_skipIntro', 'true');
-            }
-            el.modals.intro.style.display = 'none';
-            gameState.isPaused = false;
-            startLevel();
-        }
-
-        // --- Game Core ---
-
+        // --- Core Logic ---
         function startLevel() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
@@ -482,7 +502,7 @@
                     box.classList.add('selected');
                 }
             });
-            el.msg.innerText = `Selected "${char}". Type or click a number.`;
+            el.msg.innerText = `Selected "${char}".`;
             el.msg.style.color = "var(--primary)";
         }
 
@@ -508,7 +528,7 @@
                 
                 revealLetter(gameState.selectedChar, digit);
                 gameState.selectedChar = null;
-                el.msg.innerText = "Correct! Select next letter.";
+                el.msg.innerText = "Correct!";
                 el.msg.style.color = "var(--correct)";
                 checkWin();
             } else {
@@ -517,7 +537,7 @@
                     btnElement.classList.add('shake');
                     setTimeout(() => btnElement.classList.remove('shake'), 300);
                 }
-                el.msg.innerText = "Wrong number!";
+                el.msg.innerText = "Wrong!";
                 el.msg.style.color = "var(--wrong)";
             }
         }
@@ -541,7 +561,7 @@
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = true;
             if (gameState.level < 3) gameState.level++;
-            el.msg.innerText = "Level Complete! Next level coming...";
+            el.msg.innerText = "Level Complete!";
             el.msg.style.color = "var(--correct)";
             setTimeout(() => startLevel(), 2000);
         }
@@ -549,39 +569,22 @@
         function failLevel() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = true;
-            alert("Time's Up! Difficulty lowered.");
-            if (gameState.level > 1) gameState.level--;
-            startLevel();
-        }
-
-        // --- Skip / Hint Logic with Popups ---
-        
-        function showToast(text) {
-            el.toast.innerText = text;
-            el.toast.classList.add('show');
-            shakeElement(el.toast);
-            setTimeout(() => {
-                el.toast.classList.remove('show');
-            }, 2000);
+            showAlert("Time's Up!", "Don't give up! We'll lower the difficulty.", "Try Again", () => {
+                if (gameState.level > 1) gameState.level--;
+                startLevel();
+            });
         }
 
         function skipLevel() {
             if(gameState.isPaused || gameState.isTransitioning) return;
-            
-            if(gameState.score < 50) {
-                 showToast("Need 50 points to skip!");
-                 return;
-            }
+            if(gameState.score < 50) { showToast("Need 50 points!"); return; }
             addScore(-50);
             startLevel();
         }
 
         function useHint() {
             if(gameState.isPaused || gameState.isTransitioning) return;
-            if(gameState.score < 50) {
-                 showToast("Need 50 points for a hint!");
-                 return;
-            }
+            if(gameState.score < 50) { showToast("Need 50 points!"); return; }
 
             const allChars = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
             const unsolved = [...new Set(allChars)].filter(c => !gameState.guessedLetters[c]);
@@ -591,7 +594,6 @@
             addScore(-50);
             const target = unsolved[0];
             const val = gameState.letterMap[target];
-            
             gameState.guessedLetters[target] = true;
             revealLetter(target, val);
             document.querySelectorAll(`.char-box[data-char="${target}"]`).forEach(b => b.classList.add('hinted'));
@@ -601,9 +603,8 @@
         function addScore(amount) {
             gameState.score += amount;
             if (gameState.score < 0) gameState.score = 0;
-            
-            gameState.scoreHistory.push(gameState.score);
-            saveHighScore(); // Check and save if new best
+            gameState.sessionHistory.push(gameState.score);
+            recordHighScore();
             updateUI();
         }
 
@@ -627,34 +628,71 @@
             el.level.innerText = `Level ${gameState.level}`;
         }
 
-        function shakeElement(elem) {
-            elem.classList.add('shake');
-            setTimeout(() => elem.classList.remove('shake'), 300);
+        function showAlert(title, msg, btnText, callback) {
+            gameState.isPaused = true;
+            el.alert.title.innerText = title;
+            el.alert.msg.innerText = msg;
+            el.alert.btn.innerText = btnText;
+            
+            el.alert.btn.onclick = () => {
+                el.modals.alert.style.display = 'none';
+                gameState.isPaused = false;
+                if(callback) callback();
+            };
+            
+            el.modals.alert.style.display = 'flex';
         }
 
-        // --- Menu System ---
+        function showToast(text) {
+            el.toast.innerText = text;
+            el.toast.classList.add('show');
+            setTimeout(() => el.toast.classList.remove('show'), 2000);
+        }
+
+        function setupNumpad() {
+            el.numpad.innerHTML = '';
+            for(let i=0; i<=9; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'num-btn';
+                btn.innerText = i;
+                btn.onclick = () => handleInput(i, btn);
+                el.numpad.appendChild(btn);
+            }
+        }
+
+        function setupKeyboard() {
+            document.addEventListener('keydown', (e) => {
+                const key = e.key;
+                if(key >= '0' && key <= '9') {
+                    const btns = Array.from(document.querySelectorAll('.num-btn'));
+                    const targetBtn = btns.find(b => b.innerText === key);
+                    handleInput(parseInt(key), targetBtn);
+                }
+            });
+        }
+
+        function closeIntro() {
+            if(document.getElementById('dontShowAgain').checked) {
+                localStorage.setItem('sumPuzzle_skipIntro', 'true');
+            }
+            el.modals.intro.style.display = 'none';
+            gameState.isPaused = false;
+            startLevel();
+        }
 
         function openMenu(tabName) {
             gameState.isPaused = true;
             el.modals.menu.style.display = 'flex';
-            
+            switchTab(tabName);
+            if(tabName === 'status') setTimeout(drawCharts, 100);
+        }
+
+        function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
             document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
             document.getElementById(tabName).classList.add('active');
-
-            if(tabName === 'status') {
-                setTimeout(drawChart, 50);
-            }
-        }
-        
-        function switchTab(tabName) {
-             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-             document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
-             document.getElementById(tabName).classList.add('active');
-             if(tabName === 'status') setTimeout(drawChart, 50);
+            if(tabName === 'status') setTimeout(drawCharts, 100);
         }
 
         function resumeGame() {
@@ -669,32 +707,32 @@
         }
 
         async function shareScore() {
-            const text = `I scored ${gameState.score} in SumPuzzle! Can you beat me?`;
+            const text = `I scored ${gameState.score} in SumPuzzle!`;
             if (navigator.share) {
-                try { await navigator.share({ title: 'SumPuzzle Score', text: text, url: window.location.href }); } 
-                catch (err) { console.log('Share failed', err); }
+                try { await navigator.share({ title: 'SumPuzzle', text: text, url: window.location.href }); } catch(e){}
             } else {
                 navigator.clipboard.writeText(`${text} ${window.location.href}`);
-                showToast("Score copied!");
+                showToast("Copied to clipboard!");
             }
         }
 
-        function drawChart() {
-            const ctx = el.chart.getContext('2d');
-            el.chart.width = el.chart.clientWidth;
-            el.chart.height = el.chart.clientHeight;
-            const w = el.chart.width;
-            const h = el.chart.height;
-            const data = gameState.scoreHistory;
+        function drawCharts() {
+            renderChart(el.sessionChart, gameState.sessionHistory, "#6C5CE7");
+            renderChart(el.historyChart, gameState.historyData, "#00CEC9");
+        }
+
+        function renderChart(canvas, data, color) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            const w = canvas.width;
+            const h = canvas.height;
 
             ctx.clearRect(0,0,w,h);
 
-            const hasData = data.some(val => val > 0);
-            if(!hasData && data.length <= 1) {
-                ctx.fillStyle = "#b2bec3";
-                ctx.font = "bold 14px 'Segoe UI'";
-                ctx.textAlign = "center";
-                ctx.fillText("Start playing to see your stats!", w/2, h/2);
+            if(data.length < 1) {
+                ctx.fillStyle = "#b2bec3"; ctx.textAlign = "center"; ctx.font = "12px sans-serif";
+                ctx.fillText("No data yet", w/2, h/2);
                 return;
             }
 
@@ -704,16 +742,16 @@
             ctx.beginPath();
             data.forEach((point, i) => {
                 const x = i * stepX;
-                const y = h - ((point / maxVal) * (h * 0.8)) - 10; 
+                const y = h - ((point / maxVal) * (h * 0.7)) - 10; 
                 if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
             
-            ctx.strokeStyle = '#6C5CE7'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
+            ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
             
             ctx.lineTo(w, h); ctx.lineTo(0, h);
             const grad = ctx.createLinearGradient(0, 0, 0, h);
-            grad.addColorStop(0, "rgba(108, 92, 231, 0.2)");
-            grad.addColorStop(1, "rgba(108, 92, 231, 0)");
+            grad.addColorStop(0, color.replace(')', ', 0.2)').replace('rgb', 'rgba')); 
+            grad.addColorStop(1, "white");
             ctx.fillStyle = grad; ctx.fill();
         }
 
