@@ -3,63 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SumPuzzle - Global Leaderboard</title>
     
-    <title>SumPuzzle - Cognitive Math & Logic Game</title>
-    <meta name="description" content="Exercise your brain with SumPuzzle. A cryptarithmetic logic game designed to improve cognitive function, pattern recognition, and arithmetic speed over time.">
-    <meta name="keywords" content="math game, brain training, logic puzzle, cryptarithmetic, cognitive exercise, educational game, math puzzle">
-    <meta name="author" content="Tony Nahra">
+    <meta name="description" content="Exercise your brain with SumPuzzle. Improve cognitive function and arithmetic speed.">
+    <meta property="og:title" content="SumPuzzle - Brain Training">
     
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tonynahra.github.io/sumpuzzle/">
-    <meta property="og:title" content="SumPuzzle - Train Your Brain">
-    <meta property="og:description" content="Crack the code where letters are numbers. Track your cognitive progress with detailed score history charts.">
-    <meta property="og:image" content="https://tonynahra.github.io/sumpuzzle/preview.jpg">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="SumPuzzle - Cognitive Math Game">
-    <meta name="twitter:description" content="Improve your logical thinking and math skills. Track your high scores over time.">
-    <meta name="twitter:image" content="https://tonynahra.github.io/sumpuzzle/preview.jpg">
-
     <style>
         :root {
-            --primary: #6C5CE7;
-            --secondary: #00CEC9;
-            --accent: #FD79A8;
-            --dark: #2D3436;
-            --light: #DFE6E9;
-            --bg: #F0F3F5;
-            --correct: #00B894;
-            --wrong: #D63031;
-            --select: #74b9ff;
+            --primary: #6C5CE7; --secondary: #00CEC9; --accent: #FD79A8;
+            --dark: #2D3436; --light: #DFE6E9; --bg: #F0F3F5;
+            --correct: #00B894; --wrong: #D63031; --select: #74b9ff;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--dark);
-            user-select: none;
+            background-color: var(--bg); margin: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; color: var(--dark); user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-
         .game-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 450px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            position: relative;
+            background: white; padding: 2rem; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 450px;
+            display: flex; flex-direction: column; gap: 1.5rem; position: relative;
         }
 
-        /* --- Header --- */
+        /* Header & Stats */
         .header { display: flex; justify-content: space-between; align-items: center; }
         .score-box { display: flex; flex-direction: column; }
         .score-label { font-size: 0.7rem; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; }
@@ -73,67 +41,36 @@
         .timer-circle { fill: none; stroke: var(--light); stroke-width: 5; }
         .timer-path { fill: none; stroke: var(--accent); stroke-width: 5; stroke-dasharray: 126; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
 
-        /* --- Board --- */
-        .board-container {
-            background: var(--bg);
-            padding: 1.5rem;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .math-grid {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 5px 15px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-
+        /* Board */
+        .board-container { background: var(--bg); padding: 1.5rem; border-radius: 12px; display: flex; justify-content: center; }
+        .math-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 15px; font-family: 'Courier New', Courier, monospace; font-size: 2.5rem; font-weight: bold; }
         .operator-cell { grid-column: 1; grid-row: 2; display: flex; align-items: center; justify-content: center; color: var(--primary); }
         .number-row { grid-column: 2; display: flex; justify-content: flex-end; gap: 8px; }
         .sum-line { grid-column: 1 / span 2; height: 4px; background: var(--dark); border-radius: 2px; margin: 5px 0; }
-
         .char-box {
-            width: 45px; height: 55px;
-            display: flex; justify-content: center; align-items: center;
-            background: white; border-radius: 8px; border: 2px solid transparent;
-            cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            width: 45px; height: 55px; display: flex; justify-content: center; align-items: center;
+            background: white; border-radius: 8px; border: 2px solid transparent; cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .char-box:hover { transform: translateY(-2px); border-color: var(--light); }
-        .char-box.selected { background-color: var(--select); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(116, 185, 255, 0.4); }
-        .char-box.solved { background-color: transparent; color: var(--correct); font-weight: 900; box-shadow: none; cursor: default; }
+        .char-box.selected { background-color: var(--select); color: white; border-color: var(--primary); }
+        .char-box.solved { background-color: transparent; color: var(--correct); font-weight: 900; cursor: default; }
         .char-box.hinted { color: var(--secondary); }
-
         .instruction { text-align: center; color: #636e72; font-size: 0.9rem; min-height: 1.2rem; font-weight: 500; }
 
-        /* --- Controls --- */
+        /* Controls */
         .controls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .num-btn {
-            background: white; border: 2px solid var(--light); border-radius: 10px;
-            padding: 15px 0; font-size: 1.2rem; font-weight: bold; cursor: pointer;
-            transition: all 0.1s; color: var(--dark);
-        }
+        .num-btn { background: white; border: 2px solid var(--light); border-radius: 10px; padding: 15px 0; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: var(--dark); }
         .num-btn:active { transform: scale(0.95); }
-        .num-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-        /* --- Footer --- */
+        /* Footer */
         .action-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .top-actions { grid-column: 1 / span 2; display: flex; justify-content: space-between; }
-        .icon-btn {
-            background: none; border: none; cursor: pointer; font-size: 0.9rem;
-            color: #636e72; transition: all 0.2s; display: flex; align-items: center;
-            gap: 5px; padding: 8px; border-radius: 5px;
-        }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; color: #636e72; display: flex; align-items: center; gap: 5px; padding: 8px; }
         .icon-btn:hover { background: var(--light); color: var(--dark); }
-        
         .skip-btn { color: var(--wrong); }
         .hint-btn { color: var(--secondary); }
-        .share-btn { width: 100%; margin-top: 10px; background: var(--primary); color: white; justify-content: center; }
-        .share-btn:hover { background: #5649c0; color: white; }
 
-        /* --- Modals --- */
+        /* --- Fixed Height Modal --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); display: none;
@@ -141,36 +78,48 @@
             backdrop-filter: blur(4px);
         }
         .modal { 
-            background: white; padding: 2rem; border-radius: 15px; width: 85%; max-width: 400px; 
-            max-height: 90vh; overflow-y: auto;
+            background: white; border-radius: 15px; width: 85%; max-width: 400px;
+            /* Fixed Height Logic */
+            height: 500px; 
+            display: flex; flex-direction: column;
+            padding: 2rem;
             animation: slideUp 0.3s ease; position: relative;
         }
-        
-        .intro-img { 
-            width: 100%; height: 120px; background: var(--light); border-radius: 8px; 
-            margin-bottom: 15px; display: flex; align-items: center; justify-content: center; 
-            font-size: 3rem; color: var(--primary); font-weight: bold;
-        }
 
-        .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 1rem; }
+        .tab-content {
+            flex: 1; /* Take remaining height */
+            overflow-y: auto; /* Scroll internally */
+            display: none;
+            padding-right: 5px; /* Space for scrollbar */
+        }
+        .tab-content.active { display: block; }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;
+        }
+        .stat-card {
+            background: var(--bg); padding: 10px; border-radius: 8px; text-align: center;
+        }
+        .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
+        .stat-lbl { font-size: 0.7rem; color: #636e72; text-transform: uppercase; }
+
+        /* Leaderboard Table */
+        .lb-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .lb-table th { text-align: left; color: #b2bec3; padding-bottom: 5px; font-size: 0.8rem; }
+        .lb-table td { padding: 8px 0; border-bottom: 1px solid var(--light); }
+        .lb-rank { font-weight: bold; color: var(--primary); width: 30px; }
+        .lb-score { font-weight: bold; text-align: right; }
+
+        .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 1rem; flex-shrink: 0; }
         .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .rules-list li { margin-bottom: 8px; font-size: 0.95rem; }
 
         .checkbox-container { display: flex; align-items: center; margin-top: 15px; font-size: 0.9rem; color: #636e72; }
         .checkbox-container input { margin-right: 10px; transform: scale(1.2); }
 
-        canvas { width: 100%; height: 120px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 15px; }
-        .chart-label { font-size: 0.8rem; font-weight: bold; color: #636e72; display: block; margin-top: 10px; }
-
-        /* Custom Alert Styling */
-        .alert-modal { text-align: center; }
-        .alert-title { font-size: 1.5rem; color: var(--wrong); margin-bottom: 10px; font-weight: bold; }
-        .alert-msg { font-size: 1rem; color: var(--dark); margin-bottom: 20px; }
-
-        /* Toast Popup */
+        canvas { width: 100%; height: 120px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 15px; flex-shrink: 0; }
+        
         .toast {
             position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
             background: var(--dark); color: white; padding: 10px 20px; border-radius: 20px;
@@ -187,16 +136,13 @@
 
     <div class="game-container">
         <div id="toast" class="toast">Notice</div>
-
         <div class="header">
             <div class="score-box">
                 <span class="score-label">Score</span>
                 <span class="score-value" id="scoreDisplay">0</span>
                 <span class="high-score" id="highScoreDisplay">Best: 0</span>
             </div>
-            
             <div class="level-badge" id="levelDisplay">Level 1</div>
-
             <div class="timer-container">
                 <svg class="timer-svg">
                     <circle class="timer-circle" cx="25" cy="25" r="20"></circle>
@@ -208,7 +154,6 @@
         <div class="board-container">
             <div class="math-grid" id="mathGrid"></div>
         </div>
-
         <div class="instruction" id="messageArea">Select a letter, then guess a number.</div>
 
         <div class="controls" id="numpad"></div>
@@ -226,20 +171,10 @@
     </div>
 
     <div class="modal-overlay" id="introModal" style="z-index: 200;">
-        <div class="modal">
-            <div class="intro-img">🧠</div>
+        <div class="modal" style="height: auto; max-height: 90vh;">
+            <div style="font-size:3rem; text-align:center; margin-bottom:10px;">🧠</div>
             <h2 style="margin-top:0; text-align:center;">Train Your Brain</h2>
-            <p style="color:#636e72; line-height: 1.5;">
-                Welcome to <strong>SumPuzzle</strong>. This game is designed to exercise your cognitive functions, pattern recognition, and arithmetic speed.
-            </p>
-            <div style="background:var(--bg); padding:10px; border-radius:8px; margin: 10px 0; font-size:0.9rem;">
-                <strong>Goal:</strong> Improve your high score over time. Consistent practice helps build mental agility!
-            </div>
-            <ul class="rules-list" style="color:#636e72;">
-                <li>Letters represent hidden digits (0-9).</li>
-                <li>Solve the equation before the timer runs out.</li>
-                <li>Track your "High Score History" in the menu.</li>
-            </ul>
+            <p style="color:#636e72;">Welcome to SumPuzzle. Letters represent hidden digits. Solve the equation before time runs out!</p>
             <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeIntro()">Start Training</button>
             <div class="checkbox-container">
                 <input type="checkbox" id="dontShowAgain">
@@ -248,51 +183,64 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="alertModal" style="z-index: 300;">
-        <div class="modal alert-modal">
-            <div id="alertTitle" class="alert-title">Title</div>
-            <div id="alertMsg" class="alert-msg">Message goes here.</div>
-            <button class="num-btn" style="width:100%; background:var(--dark); color:white; border:none;" id="alertBtn">OK</button>
+    <div class="modal-overlay" id="submitModal" style="z-index: 250;">
+        <div class="modal" style="height: auto;">
+            <h3 style="text-align:center; margin-top:0;">Global Leaderboard</h3>
+            <p style="text-align:center; color:#636e72;">Submit your score to the world!</p>
+            <input type="text" id="playerName" placeholder="Enter your name" style="width:100%; padding:10px; border:2px solid var(--light); border-radius:8px; font-size:1rem; margin-bottom:10px; box-sizing:border-box;">
+            <button class="num-btn" style="width:100%; background:var(--correct); color:white; border:none;" onclick="submitScoreToPHP()">Submit</button>
+            <button class="icon-btn" style="width:100%; justify-content:center; margin-top:10px;" onclick="document.getElementById('submitModal').style.display='none'">Cancel</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="menuModal">
         <div class="modal">
             <div class="tabs">
-                <div class="tab active" data-tab="status">Status</div>
+                <div class="tab active" data-tab="status">Stats</div>
+                <div class="tab" data-tab="leaderboard">Leaderboard</div>
                 <div class="tab" data-tab="rules">Rules</div>
-                <div class="tab" data-tab="about">About</div>
             </div>
 
             <div id="status" class="tab-content active">
-                <h3 style="text-align: center; margin-top:0;">Performance</h3>
+                <h3 style="text-align: center; margin-top:0;">Your Performance</h3>
                 
-                <span class="chart-label">Current Session</span>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-val" id="statMaxLvl">1</span>
+                        <span class="stat-lbl">Max Level</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val" id="statLongestTime">0m</span>
+                        <span class="stat-lbl">Longest Session</span>
+                    </div>
+                </div>
+
+                <span style="font-size:0.8rem; font-weight:bold; color:#636e72;">Session Score</span>
                 <canvas id="sessionChart"></canvas>
                 
-                <span class="chart-label">High Score History</span>
-                <canvas id="historyChart"></canvas>
+                <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="openSubmitModal()">🌍 Submit to Leaderboard</button>
+                <button class="num-btn" style="width:100%; margin-top:10px; background:var(--light); color:var(--dark); border:none;" onclick="resumeGame()">Resume Game</button>
+            </div>
 
-                <button class="icon-btn share-btn" onclick="shareScore()">📤 Share Score</button>
-                <button class="num-btn" style="width:100%; margin-top:10px; background:var(--correct); color:white; border:none;" onclick="resumeGame()">Resume</button>
+            <div id="leaderboard" class="tab-content">
+                <h3 style="text-align:center; margin-top:0;">Top Players</h3>
+                <div id="lbLoading" style="text-align:center; color:#b2bec3;">Loading...</div>
+                <table class="lb-table" id="lbTable">
+                    </table>
+                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="fetchLeaderboard()">Refresh</button>
             </div>
             
             <div id="rules" class="tab-content">
-                <h3>Rules & Scoring</h3>
-                <ul class="rules-list">
-                    <li><strong>Time:</strong> Lvl 1: 90s, Lvl 2: 180s, Lvl 3: 360s.</li>
-                    <li><strong>Correct:</strong> +100 Base Points + Speed Bonus.</li>
-                    <li><strong>Penalty:</strong> Wrong guess (-25).</li>
-                    <li><strong>Skip/Hint:</strong> Costs 50 points.</li>
+                <h3>Rules</h3>
+                <ul style="padding-left:20px; color:#636e72;">
+                    <li>Letters are hidden digits (0-9).</li>
+                    <li>Lvl 1: 90s | Lvl 2: 180s | Lvl 3: 360s.</li>
+                    <li>Correct: +100pts + Time Bonus.</li>
+                    <li>Wrong: -25pts. Skip/Hint: -50pts.</li>
                 </ul>
-                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="switchTab('status')">Back</button>
-            </div>
-
-            <div id="about" class="tab-content">
-                <h3>SumPuzzle V6</h3>
-                <p>Created to challenge your logical arithmetic skills.</p>
-                <a href="https://tonynahra.github.io" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration: none;">tonynahra.github.io</a>
-                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="switchTab('status')">Back</button>
+                <h3>About</h3>
+                <p style="font-size:0.9rem; color:#636e72;">Created to challenge logical arithmetic.</p>
+                <button class="num-btn" style="width:100%; background:var(--light); border:none;" onclick="switchTab('status')">Back</button>
             </div>
         </div>
     </div>
@@ -308,20 +256,22 @@
         // --- Game State ---
         const gameState = {
             score: 0,
-            highScoreObj: { value: 0, date: '-' },
+            stats: { 
+                highScore: 0, 
+                highScoreDate: '-', 
+                maxLevel: 1, 
+                longestSession: 0 // in seconds
+            },
             historyData: [], 
             level: 1,
             timeLeft: 0,
             maxTime: 60,
             timerInterval: null,
             puzzle: null,
-            letterMap: {}, 
-            reverseMap: {}, 
-            guessedLetters: {}, 
-            selectedChar: null,
+            letterMap: {}, reverseMap: {}, guessedLetters: {}, selectedChar: null,
             sessionHistory: [0],
-            isPaused: true,
-            isTransitioning: false
+            isPaused: true, isTransitioning: false,
+            sessionStartTime: Date.now()
         };
 
         // --- DOM Elements ---
@@ -334,86 +284,79 @@
             timerPath: document.getElementById('timerPath'),
             msg: document.getElementById('messageArea'),
             sessionChart: document.getElementById('sessionChart'),
-            historyChart: document.getElementById('historyChart'),
             toast: document.getElementById('toast'),
-            modals: {
-                intro: document.getElementById('introModal'),
-                menu: document.getElementById('menuModal'),
-                alert: document.getElementById('alertModal')
-            },
-            alert: {
-                title: document.getElementById('alertTitle'),
-                msg: document.getElementById('alertMsg'),
-                btn: document.getElementById('alertBtn')
-            }
+            statMaxLvl: document.getElementById('statMaxLvl'),
+            statLongestTime: document.getElementById('statLongestTime'),
+            modals: { intro: document.getElementById('introModal'), menu: document.getElementById('menuModal'), submit: document.getElementById('submitModal') }
         };
 
         function init() {
-            setupNumpad();
-            setupTabs();
-            setupKeyboard();
-            loadData();
+            setupNumpad(); setupTabs(); setupKeyboard(); loadData();
             
             const skipIntro = localStorage.getItem('sumPuzzle_skipIntro');
-            if(skipIntro === 'true') {
-                gameState.isPaused = false;
-                startLevel();
-            } else {
-                el.modals.intro.style.display = 'flex';
-            }
+            if(skipIntro === 'true') { gameState.isPaused = false; startLevel(); } 
+            else { el.modals.intro.style.display = 'flex'; }
             
             document.getElementById('rulesBtn').onclick = () => openMenu('rules');
             document.getElementById('statsBtn').onclick = () => openMenu('status');
             document.getElementById('hintBtn').onclick = useHint;
             document.getElementById('skipBtn').onclick = skipLevel;
+            
+            // Periodically update session length
+            setInterval(updateSessionTime, 30000); 
         }
 
-        // --- Data Persistence ---
+        // --- Data & Stats ---
         function loadData() {
-            const saved = localStorage.getItem('sumPuzzle_data_v5');
+            const saved = localStorage.getItem('sumPuzzle_stats_v6');
             if (saved) {
-                const data = JSON.parse(saved);
-                gameState.highScoreObj = data.highScoreObj || { value: 0, date: '-' };
-                gameState.historyData = data.historyData || [];
+                gameState.stats = JSON.parse(saved);
             }
-            updateHighScoreUI();
+            updateStatsUI();
         }
 
         function saveData() {
-            const data = {
-                highScoreObj: gameState.highScoreObj,
-                historyData: gameState.historyData
-            };
-            localStorage.setItem('sumPuzzle_data_v5', JSON.stringify(data));
+            localStorage.setItem('sumPuzzle_stats_v6', JSON.stringify(gameState.stats));
         }
 
-        function recordHighScore() {
-            if (gameState.score > gameState.highScoreObj.value) {
+        function updateStats(newScore) {
+            // High Score
+            if (newScore > gameState.stats.highScore) {
                 const now = new Date();
-                const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
-                
-                gameState.highScoreObj = { value: gameState.score, date: dateStr };
-                
-                // Add to history (limit to last 20)
-                gameState.historyData.push(gameState.score);
-                if(gameState.historyData.length > 20) gameState.historyData.shift();
-                
+                gameState.stats.highScore = newScore;
+                gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
+            }
+            // Max Level (Check current)
+            if (gameState.level > gameState.stats.maxLevel) {
+                gameState.stats.maxLevel = gameState.level;
+            }
+            saveData();
+            updateStatsUI();
+        }
+
+        function updateSessionTime() {
+            const currentSessionDuration = (Date.now() - gameState.sessionStartTime) / 1000;
+            if (currentSessionDuration > gameState.stats.longestSession) {
+                gameState.stats.longestSession = currentSessionDuration;
                 saveData();
-                updateHighScoreUI();
+                updateStatsUI();
             }
         }
 
-        function updateHighScoreUI() {
-            el.highScore.innerText = gameState.highScoreObj.value > 0 
-                ? `Best: ${gameState.highScoreObj.value}` 
-                : `Best: 0`;
+        function updateStatsUI() {
+            el.highScore.innerText = `Best: ${gameState.stats.highScore}`;
+            el.statMaxLvl.innerText = gameState.stats.maxLevel;
+            
+            const mins = Math.floor(gameState.stats.longestSession / 60);
+            el.statLongestTime.innerText = mins + "m";
         }
 
-        // --- Core Logic ---
+        // --- Game Logic ---
         function startLevel() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
-            
+            updateStats(gameState.score); // Check level/score stats
+
             const config = LEVELS[gameState.level] || LEVELS[3];
             gameState.maxTime = config.time;
             gameState.timeLeft = config.time;
@@ -431,29 +374,22 @@
 
         function generatePuzzle(config, attempts = 0) {
             if(attempts > 50) config.distinct = Math.max(3, config.distinct - 1);
-
             const min = Math.pow(10, config.digits - 1);
             const max = Math.pow(10, config.digits) - 1;
-            
             let n1 = Math.floor(Math.random() * (max - min) + min);
             let n2 = Math.floor(Math.random() * (max - min) + min);
             let sum = n1 + n2;
-
-            const allStr = `${n1}${n2}${sum}`;
-            const uniqueDigits = [...new Set(allStr.split(''))];
+            const uniqueDigits = [...new Set(`${n1}${n2}${sum}`.split(''))];
 
             if ((uniqueDigits.length < config.distinct || uniqueDigits.length > 10) && attempts <= 50) {
                 return generatePuzzle(config, attempts + 1);
             }
 
             const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ".split('').sort(() => 0.5 - Math.random());
-            gameState.letterMap = {};
-            gameState.reverseMap = {};
-            
+            gameState.letterMap = {}; gameState.reverseMap = {};
             uniqueDigits.forEach((digit, index) => {
-                const char = letters[index];
-                gameState.letterMap[char] = parseInt(digit);
-                gameState.reverseMap[digit] = char;
+                gameState.letterMap[letters[index]] = parseInt(digit);
+                gameState.reverseMap[digit] = letters[index];
             });
 
             gameState.puzzle = {
@@ -466,159 +402,104 @@
         function renderBoard() {
             el.grid.innerHTML = '';
             const createRow = (arr, rowId) => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'number-row';
-                rowDiv.style.gridRow = rowId; 
-                arr.forEach(char => {
-                    const box = document.createElement('div');
-                    box.className = 'char-box';
-                    box.dataset.char = char;
-                    box.innerText = char;
-                    box.onclick = () => selectLetter(char);
-                    rowDiv.appendChild(box);
-                });
-                return rowDiv;
+                const r = document.createElement('div'); r.className='number-row'; r.style.gridRow=rowId; 
+                arr.forEach(c => {
+                    const b=document.createElement('div'); b.className='char-box'; b.dataset.char=c; b.innerText=c;
+                    b.onclick=()=>selectLetter(c); r.appendChild(b);
+                }); return r;
             };
-
             el.grid.appendChild(createRow(gameState.puzzle.row1, 1));
-            const op = document.createElement('div');
-            op.className = 'operator-cell'; op.innerText = '+';
-            el.grid.appendChild(op);
+            const op=document.createElement('div'); op.className='operator-cell'; op.innerText='+'; el.grid.appendChild(op);
             el.grid.appendChild(createRow(gameState.puzzle.row2, 2));
-            const line = document.createElement('div');
-            line.className = 'sum-line'; line.style.gridRow = 3;
-            el.grid.appendChild(line);
+            const l=document.createElement('div'); l.className='sum-line'; l.style.gridRow=3; el.grid.appendChild(l);
             el.grid.appendChild(createRow(gameState.puzzle.sum, 4));
         }
 
         function selectLetter(char) {
-            if(gameState.isPaused || gameState.isTransitioning) return;
+            if(gameState.isPaused) return;
             if(gameState.guessedLetters[char]) return; 
-
             gameState.selectedChar = char;
-            document.querySelectorAll('.char-box').forEach(box => {
-                box.classList.remove('selected');
-                if(box.dataset.char === char && !box.classList.contains('solved')) {
-                    box.classList.add('selected');
-                }
+            document.querySelectorAll('.char-box').forEach(b => {
+                b.classList.remove('selected');
+                if(b.dataset.char === char && !b.classList.contains('solved')) b.classList.add('selected');
             });
-            el.msg.innerText = `Selected "${char}".`;
-            el.msg.style.color = "var(--primary)";
+            el.msg.innerText = `Selected "${char}".`; el.msg.style.color = "var(--primary)";
         }
 
-        function handleInput(digit, btnElement) {
-            if (gameState.isPaused || gameState.isTransitioning) return;
+        function handleInput(digit, btn) {
+            if (gameState.isPaused) return;
+            if (!gameState.selectedChar) { showToast("Select a letter first!"); return; }
+            if(btn) { btn.style.transform = "scale(0.9)"; setTimeout(()=> btn.style.transform = "scale(1)", 100); }
 
-            if (!gameState.selectedChar) {
-                showToast("Select a letter first!");
-                return;
-            }
-
-            if(btnElement) {
-                btnElement.style.transform = "scale(0.9)";
-                setTimeout(()=> btnElement.style.transform = "scale(1)", 100);
-            }
-
-            const correctDigit = gameState.letterMap[gameState.selectedChar];
-
-            if (digit === correctDigit) {
+            if (digit === gameState.letterMap[gameState.selectedChar]) {
                 gameState.guessedLetters[gameState.selectedChar] = true;
                 const timeFactor = gameState.timeLeft / gameState.maxTime;
                 addScore(Math.round(100 + (50 * timeFactor)));
-                
                 revealLetter(gameState.selectedChar, digit);
                 gameState.selectedChar = null;
-                el.msg.innerText = "Correct!";
-                el.msg.style.color = "var(--correct)";
+                el.msg.innerText = "Correct!"; el.msg.style.color = "var(--correct)";
                 checkWin();
             } else {
                 addScore(-25);
-                if(btnElement) {
-                    btnElement.classList.add('shake');
-                    setTimeout(() => btnElement.classList.remove('shake'), 300);
-                }
-                el.msg.innerText = "Wrong!";
-                el.msg.style.color = "var(--wrong)";
+                if(btn) { btn.classList.add('shake'); setTimeout(() => btn.classList.remove('shake'), 300); }
+                el.msg.innerText = "Wrong!"; el.msg.style.color = "var(--wrong)";
             }
         }
 
         function revealLetter(char, digit) {
-            const boxes = document.querySelectorAll(`.char-box[data-char="${char}"]`);
-            boxes.forEach(box => {
-                box.innerText = digit;
-                box.classList.remove('selected');
-                box.classList.add('solved');
+            document.querySelectorAll(`.char-box[data-char="${char}"]`).forEach(b => {
+                b.innerText = digit; b.classList.remove('selected'); b.classList.add('solved');
             });
         }
 
         function checkWin() {
             const needed = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
-            const allSolved = needed.every(c => gameState.guessedLetters[c]);
-            if (allSolved) levelComplete();
-        }
-
-        function levelComplete() {
-            clearInterval(gameState.timerInterval);
-            gameState.isTransitioning = true;
-            if (gameState.level < 3) gameState.level++;
-            el.msg.innerText = "Level Complete!";
-            el.msg.style.color = "var(--correct)";
-            setTimeout(() => startLevel(), 2000);
+            if (needed.every(c => gameState.guessedLetters[c])) {
+                clearInterval(gameState.timerInterval);
+                gameState.isTransitioning = true;
+                updateStats(gameState.score); // Update stats on win
+                if (gameState.level < 3) gameState.level++;
+                el.msg.innerText = "Level Complete!"; el.msg.style.color = "var(--correct)";
+                setTimeout(startLevel, 2000);
+            }
         }
 
         function failLevel() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = true;
-            showAlert("Time's Up!", "Don't give up! We'll lower the difficulty.", "Try Again", () => {
-                if (gameState.level > 1) gameState.level--;
-                startLevel();
-            });
-        }
-
-        function skipLevel() {
-            if(gameState.isPaused || gameState.isTransitioning) return;
-            if(gameState.score < 50) { showToast("Need 50 points!"); return; }
-            addScore(-50);
+            alert("Time's Up! Difficulty lowered.");
+            if (gameState.level > 1) gameState.level--;
             startLevel();
         }
 
-        function useHint() {
-            if(gameState.isPaused || gameState.isTransitioning) return;
-            if(gameState.score < 50) { showToast("Need 50 points!"); return; }
-
-            const allChars = [...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum];
-            const unsolved = [...new Set(allChars)].filter(c => !gameState.guessedLetters[c]);
-            
-            if(unsolved.length === 0) return;
-
-            addScore(-50);
-            const target = unsolved[0];
-            const val = gameState.letterMap[target];
-            gameState.guessedLetters[target] = true;
-            revealLetter(target, val);
-            document.querySelectorAll(`.char-box[data-char="${target}"]`).forEach(b => b.classList.add('hinted'));
-            checkWin();
-        }
-
         function addScore(amount) {
-            gameState.score += amount;
-            if (gameState.score < 0) gameState.score = 0;
+            gameState.score = Math.max(0, gameState.score + amount);
             gameState.sessionHistory.push(gameState.score);
-            recordHighScore();
+            updateStats(gameState.score);
             updateUI();
         }
 
+        function skipLevel() { if(!gameState.isPaused && checkCost(50)) { addScore(-50); startLevel(); } }
+        function useHint() {
+            if(gameState.isPaused || !checkCost(50)) return;
+            const unsolved = [...new Set([...gameState.puzzle.row1, ...gameState.puzzle.row2, ...gameState.puzzle.sum])].filter(c => !gameState.guessedLetters[c]);
+            if(unsolved.length === 0) return;
+            addScore(-50);
+            const target = unsolved[0];
+            gameState.guessedLetters[target] = true;
+            revealLetter(target, gameState.letterMap[target]);
+            document.querySelectorAll(`.char-box[data-char="${target}"]`).forEach(b => b.classList.add('hinted'));
+            checkWin();
+        }
+        function checkCost(cost) { if(gameState.score < cost) { showToast(`Need ${cost} pts!`); return false; } return true; }
+
         function startTimer() {
-            const pathLength = 126;
             gameState.timerInterval = setInterval(() => {
                 if (gameState.isPaused) return;
-
                 gameState.timeLeft--;
-                const percentage = Math.max(0, gameState.timeLeft / gameState.maxTime);
-                el.timerPath.style.strokeDashoffset = pathLength - (pathLength * percentage);
-                
-                el.timerPath.style.stroke = percentage < 0.25 ? "var(--wrong)" : "var(--accent)";
-
+                const pct = Math.max(0, gameState.timeLeft / gameState.maxTime);
+                el.timerPath.style.strokeDashoffset = 126 - (126 * pct);
+                el.timerPath.style.stroke = pct < 0.25 ? "var(--wrong)" : "var(--accent)";
                 if (gameState.timeLeft <= 0) failLevel();
             }, 1000);
         }
@@ -627,132 +508,95 @@
             el.score.innerText = gameState.score;
             el.level.innerText = `Level ${gameState.level}`;
         }
+        function showToast(text) { el.toast.innerText = text; el.toast.classList.add('show'); setTimeout(() => el.toast.classList.remove('show'), 2000); }
 
-        function showAlert(title, msg, btnText, callback) {
-            gameState.isPaused = true;
-            el.alert.title.innerText = title;
-            el.alert.msg.innerText = msg;
-            el.alert.btn.innerText = btnText;
+        // --- PHP / Leaderboard Integration ---
+        
+        const API_URL = 'score_api.php'; // Ensure this file exists on your server
+
+        function openSubmitModal() {
+            el.modals.submit.style.display = 'flex';
+        }
+
+        function submitScoreToPHP() {
+            const name = document.getElementById('playerName').value.trim();
+            if(!name) { alert("Please enter a name"); return; }
             
-            el.alert.btn.onclick = () => {
-                el.modals.alert.style.display = 'none';
-                gameState.isPaused = false;
-                if(callback) callback();
-            };
-            
-            el.modals.alert.style.display = 'flex';
-        }
+            const payload = new URLSearchParams();
+            payload.append('action', 'submit');
+            payload.append('name', name);
+            payload.append('score', gameState.score);
+            payload.append('level', gameState.stats.maxLevel);
 
-        function showToast(text) {
-            el.toast.innerText = text;
-            el.toast.classList.add('show');
-            setTimeout(() => el.toast.classList.remove('show'), 2000);
-        }
-
-        function setupNumpad() {
-            el.numpad.innerHTML = '';
-            for(let i=0; i<=9; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'num-btn';
-                btn.innerText = i;
-                btn.onclick = () => handleInput(i, btn);
-                el.numpad.appendChild(btn);
-            }
-        }
-
-        function setupKeyboard() {
-            document.addEventListener('keydown', (e) => {
-                const key = e.key;
-                if(key >= '0' && key <= '9') {
-                    const btns = Array.from(document.querySelectorAll('.num-btn'));
-                    const targetBtn = btns.find(b => b.innerText === key);
-                    handleInput(parseInt(key), targetBtn);
+            fetch(API_URL, { method: 'POST', body: payload })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    el.modals.submit.style.display = 'none';
+                    showToast("Score Submitted!");
+                    openMenu('leaderboard'); // Switch to leaderboard tab
+                } else {
+                    alert("Error: " + data.message);
                 }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Failed to connect to server.");
             });
         }
 
-        function closeIntro() {
-            if(document.getElementById('dontShowAgain').checked) {
-                localStorage.setItem('sumPuzzle_skipIntro', 'true');
-            }
-            el.modals.intro.style.display = 'none';
-            gameState.isPaused = false;
-            startLevel();
-        }
+        function fetchLeaderboard() {
+            const lbDiv = document.getElementById('lbTable');
+            document.getElementById('lbLoading').style.display = 'block';
+            lbDiv.innerHTML = '';
 
-        function openMenu(tabName) {
-            gameState.isPaused = true;
-            el.modals.menu.style.display = 'flex';
-            switchTab(tabName);
-            if(tabName === 'status') setTimeout(drawCharts, 100);
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-            if(tabName === 'status') setTimeout(drawCharts, 100);
-        }
-
-        function resumeGame() {
-            el.modals.menu.style.display = 'none';
-            gameState.isPaused = false;
-        }
-
-        function setupTabs() {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            fetch(API_URL + '?action=get')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('lbLoading').style.display = 'none';
+                let html = '<tr><th>#</th><th>Name</th><th>Lvl</th><th style="text-align:right">Score</th></tr>';
+                data.forEach((row, index) => {
+                    let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : (index + 1)));
+                    html += `<tr>
+                        <td class="lb-rank">${rankIcon}</td>
+                        <td>${row.name}</td>
+                        <td>${row.level}</td>
+                        <td class="lb-score">${row.score}</td>
+                    </tr>`;
+                });
+                lbDiv.innerHTML = html;
+            })
+            .catch(err => {
+                document.getElementById('lbLoading').innerText = "Failed to load scores.";
             });
         }
 
-        async function shareScore() {
-            const text = `I scored ${gameState.score} in SumPuzzle!`;
-            if (navigator.share) {
-                try { await navigator.share({ title: 'SumPuzzle', text: text, url: window.location.href }); } catch(e){}
-            } else {
-                navigator.clipboard.writeText(`${text} ${window.location.href}`);
-                showToast("Copied to clipboard!");
-            }
+        // --- Utils ---
+        function setupNumpad() { for(let i=0; i<=9; i++) { const b=document.createElement('button'); b.className='num-btn'; b.innerText=i; b.onclick=()=>handleInput(i,b); el.numpad.appendChild(b); } }
+        function setupKeyboard() { document.addEventListener('keydown', e => { if(e.key>='0'&&e.key<='9') { const b=[...document.querySelectorAll('.num-btn')].find(x=>x.innerText===e.key); handleInput(parseInt(e.key),b); } }); }
+        function closeIntro() { if(document.getElementById('dontShowAgain').checked) localStorage.setItem('sumPuzzle_skipIntro', 'true'); el.modals.intro.style.display='none'; gameState.isPaused=false; startLevel(); }
+        function openMenu(tab) { gameState.isPaused=true; updateSessionTime(); el.modals.menu.style.display='flex'; switchTab(tab); }
+        function resumeGame() { el.modals.menu.style.display='none'; gameState.isPaused=false; }
+        
+        function switchTab(t) {
+            document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active');
+            document.getElementById(t).classList.add('active');
+            if(t==='status') setTimeout(drawChart, 100);
+            if(t==='leaderboard') fetchLeaderboard();
         }
-
-        function drawCharts() {
-            renderChart(el.sessionChart, gameState.sessionHistory, "#6C5CE7");
-            renderChart(el.historyChart, gameState.historyData, "#00CEC9");
-        }
-
-        function renderChart(canvas, data, color) {
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-            const w = canvas.width;
-            const h = canvas.height;
-
-            ctx.clearRect(0,0,w,h);
-
-            if(data.length < 1) {
-                ctx.fillStyle = "#b2bec3"; ctx.textAlign = "center"; ctx.font = "12px sans-serif";
-                ctx.fillText("No data yet", w/2, h/2);
-                return;
-            }
-
-            const maxVal = Math.max(...data, 100);
-            const stepX = w / Math.max(data.length - 1, 1);
-            
+        function setupTabs() { document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>switchTab(t.dataset.tab))); }
+        function drawChart() {
+            const c=el.sessionChart, ctx=c.getContext('2d'), data=gameState.sessionHistory;
+            c.width=c.clientWidth; c.height=c.clientHeight; ctx.clearRect(0,0,c.width,c.height);
+            if(data.length<1) return;
+            const max=Math.max(...data,100), step=c.width/Math.max(data.length-1,1);
             ctx.beginPath();
-            data.forEach((point, i) => {
-                const x = i * stepX;
-                const y = h - ((point / maxVal) * (h * 0.7)) - 10; 
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            });
-            
-            ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
-            
-            ctx.lineTo(w, h); ctx.lineTo(0, h);
-            const grad = ctx.createLinearGradient(0, 0, 0, h);
-            grad.addColorStop(0, color.replace(')', ', 0.2)').replace('rgb', 'rgba')); 
-            grad.addColorStop(1, "white");
-            ctx.fillStyle = grad; ctx.fill();
+            data.forEach((p,i) => { const x=i*step, y=c.height-((p/max)*(c.height*0.7))-10; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+            ctx.strokeStyle='#6C5CE7'; ctx.lineWidth=3; ctx.stroke();
+            ctx.lineTo(c.width,c.height); ctx.lineTo(0,c.height);
+            const g=ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0,'rgba(108,92,231,0.2)'); g.addColorStop(1,'white');
+            ctx.fillStyle=g; ctx.fill();
         }
 
         init();
