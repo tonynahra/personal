@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SumPuzzle - Global Leaderboard</title>
+    <title>SumPuzzle - Brain Training V8</title>
     
     <meta name="description" content="Exercise your brain with SumPuzzle. Improve cognitive function and arithmetic speed.">
     <meta property="og:title" content="SumPuzzle - Brain Training">
@@ -27,7 +27,7 @@
             display: flex; flex-direction: column; gap: 1.5rem; position: relative;
         }
 
-        /* Header & Stats */
+        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; }
         .score-box { display: flex; flex-direction: column; }
         .score-label { font-size: 0.7rem; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; }
@@ -43,14 +43,14 @@
 
         /* Board */
         .board-container { background: var(--bg); padding: 1.5rem; border-radius: 12px; display: flex; justify-content: center; }
-        .math-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 15px; font-family: 'Courier New', Courier, monospace; font-size: 2.5rem; font-weight: bold; }
+        .math-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 15px; font-family: 'Courier New', Courier, monospace; font-size: 2.2rem; font-weight: bold; }
         .operator-cell { grid-column: 1; grid-row: 2; display: flex; align-items: center; justify-content: center; color: var(--primary); }
         .number-row { grid-column: 2; display: flex; justify-content: flex-end; gap: 8px; }
         .sum-line { grid-column: 1 / span 2; height: 4px; background: var(--dark); border-radius: 2px; margin: 5px 0; }
         .char-box {
-            width: 45px; height: 55px; display: flex; justify-content: center; align-items: center;
+            width: 40px; height: 50px; display: flex; justify-content: center; align-items: center;
             background: white; border-radius: 8px; border: 2px solid transparent; cursor: pointer;
-            transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 1.8rem;
         }
         .char-box.selected { background-color: var(--select); color: white; border-color: var(--primary); }
         .char-box.solved { background-color: transparent; color: var(--correct); font-weight: 900; cursor: default; }
@@ -70,39 +70,54 @@
         .skip-btn { color: var(--wrong); }
         .hint-btn { color: var(--secondary); }
 
-        /* --- Fixed Height Modal --- */
+        /* --- Modals --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); display: none;
             justify-content: center; align-items: center; z-index: 100;
             backdrop-filter: blur(4px);
         }
+
+        /* Base Modal (Auto height for Intro/Alerts) */
         .modal { 
             background: white; border-radius: 15px; width: 85%; max-width: 400px;
-            /* Fixed Height Logic */
-            height: 500px; 
-            display: flex; flex-direction: column;
-            padding: 2rem;
-            animation: slideUp 0.3s ease; position: relative;
+            padding: 2rem; position: relative; animation: slideUp 0.3s ease;
+            max-height: 90vh; overflow-y: auto;
         }
 
-        .tab-content {
-            flex: 1; /* Take remaining height */
-            overflow-y: auto; /* Scroll internally */
-            display: none;
-            padding-right: 5px; /* Space for scrollbar */
+        /* Fixed Menu Modal (Fixed height for Stats/Rules) */
+        .modal.menu-modal {
+            height: 550px; /* Fixed height */
+            display: flex; flex-direction: column;
+            padding: 0; /* Padding moved to inner containers */
         }
+        .menu-header { padding: 1.5rem 1.5rem 0 1.5rem; flex-shrink: 0; }
+        .menu-body { padding: 1.5rem; flex: 1; overflow-y: auto; }
+
+        /* Tabs */
+        .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 1rem; }
+        .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
+
+        /* Stats Sub-Tabs */
+        .sub-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; background: var(--bg); padding: 5px; border-radius: 8px; }
+        .sub-tab { padding: 5px 15px; cursor: pointer; font-size: 0.85rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; }
+        .sub-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
         /* Stats Grid */
-        .stats-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;
-        }
-        .stat-card {
-            background: var(--bg); padding: 10px; border-radius: 8px; text-align: center;
-        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-card { background: var(--bg); padding: 10px; border-radius: 8px; text-align: center; }
         .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
         .stat-lbl { font-size: 0.7rem; color: #636e72; text-transform: uppercase; }
+
+        /* Rules Table */
+        .rules-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+        .rules-table th { color: #b2bec3; border-bottom: 1px solid var(--light); padding: 8px; }
+        .rules-table td { border-bottom: 1px solid var(--bg); padding: 8px; color: var(--dark); }
+        .rules-table tr:last-child td { border: none; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color: white; }
 
         /* Leaderboard Table */
         .lb-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
@@ -111,14 +126,9 @@
         .lb-rank { font-weight: bold; color: var(--primary); width: 30px; }
         .lb-score { font-weight: bold; text-align: right; }
 
-        .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 1rem; flex-shrink: 0; }
-        .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-
         .checkbox-container { display: flex; align-items: center; margin-top: 15px; font-size: 0.9rem; color: #636e72; }
         .checkbox-container input { margin-right: 10px; transform: scale(1.2); }
-
-        canvas { width: 100%; height: 120px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 15px; flex-shrink: 0; }
+        canvas { width: 100%; height: 150px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 15px; }
         
         .toast {
             position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
@@ -161,7 +171,7 @@
         <div class="action-bar">
             <div class="top-actions">
                 <button class="icon-btn" id="rulesBtn"><span>?</span> Rules</button>
-                <button class="icon-btn" id="statsBtn"><span>📊</span> Menu</button>
+                <button class="icon-btn" id="statsBtn"><span>📊</span> Stats</button>
             </div>
             <div class="top-actions" style="margin-top:10px; border-top: 1px solid var(--light); padding-top:10px;">
                 <button class="icon-btn skip-btn" id="skipBtn"><span>⏩</span> Skip (-50)</button>
@@ -171,10 +181,16 @@
     </div>
 
     <div class="modal-overlay" id="introModal" style="z-index: 200;">
-        <div class="modal" style="height: auto; max-height: 90vh;">
+        <div class="modal">
             <div style="font-size:3rem; text-align:center; margin-bottom:10px;">🧠</div>
             <h2 style="margin-top:0; text-align:center;">Train Your Brain</h2>
-            <p style="color:#636e72;">Welcome to SumPuzzle. Letters represent hidden digits. Solve the equation before time runs out!</p>
+            <p style="color:#636e72; line-height: 1.5; font-size: 1rem;">
+                Welcome to <strong>SumPuzzle</strong>. Crack the code where letters represent hidden digits.
+            </p>
+            <div style="background:var(--bg); padding:15px; border-radius:8px; margin: 15px 0;">
+                <h4 style="margin:0 0 5px 0; color:var(--dark);">Goal:</h4>
+                <p style="margin:0; font-size:0.9rem; color:#636e72;">Solve the arithmetic equations to advance levels. Higher levels add more digits and complexity.</p>
+            </div>
             <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--primary); color:white; border:none;" onclick="closeIntro()">Start Training</button>
             <div class="checkbox-container">
                 <input type="checkbox" id="dontShowAgain">
@@ -184,7 +200,7 @@
     </div>
 
     <div class="modal-overlay" id="submitModal" style="z-index: 250;">
-        <div class="modal" style="height: auto;">
+        <div class="modal">
             <h3 style="text-align:center; margin-top:0;">Global Leaderboard</h3>
             <p style="text-align:center; color:#636e72;">Submit your score to the world!</p>
             <input type="text" id="playerName" placeholder="Enter your name" style="width:100%; padding:10px; border:2px solid var(--light); border-radius:8px; font-size:1rem; margin-bottom:10px; box-sizing:border-box;">
@@ -194,81 +210,119 @@
     </div>
 
     <div class="modal-overlay" id="menuModal">
-        <div class="modal">
-            <div class="tabs">
-                <div class="tab active" data-tab="status">Stats</div>
-                <div class="tab" data-tab="leaderboard">Leaderboard</div>
-                <div class="tab" data-tab="rules">Rules</div>
+        <div class="modal menu-modal">
+            <div class="menu-header">
+                <div class="tabs">
+                    <div class="tab active" data-tab="status">Stats</div>
+                    <div class="tab" data-tab="leaderboard">Leaderboard</div>
+                    <div class="tab" data-tab="rules">Rules</div>
+                </div>
             </div>
 
-            <div id="status" class="tab-content active">
-                <h3 style="text-align: center; margin-top:0;">Your Performance</h3>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <span class="stat-val" id="statMaxLvl">1</span>
-                        <span class="stat-lbl">Max Level</span>
+            <div class="menu-body">
+                <div id="status" class="tab-content active">
+                    <h3 style="text-align: center; margin-top:0;">Your Performance</h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-val" id="statMaxLvl">1</span>
+                            <span class="stat-lbl">Max Level</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-val" id="statLongestTime">0m</span>
+                            <span class="stat-lbl">Longest Session</span>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <span class="stat-val" id="statLongestTime">0m</span>
-                        <span class="stat-lbl">Longest Session</span>
+
+                    <div class="sub-tabs">
+                        <div class="sub-tab active" id="subTabSession" onclick="togglePerfChart('session')">Session</div>
+                        <div class="sub-tab" id="subTabHistory" onclick="togglePerfChart('history')">High Scores</div>
                     </div>
+
+                    <canvas id="sessionChart"></canvas>
+                    <canvas id="historyChart" style="display:none;"></canvas>
+                    
+                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="openSubmitModal()">🌍 Submit to Leaderboard</button>
+                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--light); color:var(--dark); border:none;" onclick="resumeGame()">Resume Game</button>
                 </div>
 
-                <span style="font-size:0.8rem; font-weight:bold; color:#636e72;">Session Score</span>
-                <canvas id="sessionChart"></canvas>
+                <div id="leaderboard" class="tab-content">
+                    <h3 style="text-align:center; margin-top:0;">Top Players</h3>
+                    <div id="lbLoading" style="text-align:center; color:#b2bec3;">Loading...</div>
+                    <table class="lb-table" id="lbTable">
+                        </table>
+                    <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="fetchLeaderboard()">Refresh</button>
+                </div>
                 
-                <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="openSubmitModal()">🌍 Submit to Leaderboard</button>
-                <button class="num-btn" style="width:100%; margin-top:10px; background:var(--light); color:var(--dark); border:none;" onclick="resumeGame()">Resume Game</button>
-            </div>
-
-            <div id="leaderboard" class="tab-content">
-                <h3 style="text-align:center; margin-top:0;">Top Players</h3>
-                <div id="lbLoading" style="text-align:center; color:#b2bec3;">Loading...</div>
-                <table class="lb-table" id="lbTable">
+                <div id="rules" class="tab-content">
+                    <h3 style="margin-top:0;">Rules & Levels</h3>
+                    <p style="color:#636e72; margin-bottom:15px;">Solve the addition puzzle. Letters represent digits 0-9. No letter represents the same digit.</p>
+                    
+                    <table class="rules-table">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Digits</th>
+                                <th>Time</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td> <td>2</td> <td>90s</td> 
+                                <td><span class="tag" style="background:#00b894;">Easy</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td> <td>3</td> <td>120s</td> 
+                                <td><span class="tag" style="background:#00cec9;">Med</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td> <td>4</td> <td>180s</td> 
+                                <td><span class="tag" style="background:#0984e3;">Hard</span></td>
+                            </tr>
+                            <tr>
+                                <td>4</td> <td>5</td> <td>240s</td> 
+                                <td><span class="tag" style="background:#6c5ce7;">Expert</span></td>
+                            </tr>
+                            <tr>
+                                <td>5</td> <td>6</td> <td>300s</td> 
+                                <td><span class="tag" style="background:#d63031;">Master</span></td>
+                            </tr>
+                        </tbody>
                     </table>
-                <button class="num-btn" style="width:100%; margin-top:1rem; background:var(--light); border:none;" onclick="fetchLeaderboard()">Refresh</button>
-            </div>
-            
-            <div id="rules" class="tab-content">
-                <h3>Rules</h3>
-                <ul style="padding-left:20px; color:#636e72;">
-                    <li>Letters are hidden digits (0-9).</li>
-                    <li>Lvl 1: 90s | Lvl 2: 180s | Lvl 3: 360s.</li>
-                    <li>Correct: +100pts + Time Bonus.</li>
-                    <li>Wrong: -25pts. Skip/Hint: -50pts.</li>
-                </ul>
-                <h3>About</h3>
-                <p style="font-size:0.9rem; color:#636e72;">Created to challenge logical arithmetic.</p>
-                <button class="num-btn" style="width:100%; background:var(--light); border:none;" onclick="switchTab('status')">Back</button>
+
+                    <div style="margin-top:20px; font-size:0.9rem; color:#636e72;">
+                        <strong>Scoring:</strong><br>
+                        Correct: +100pts + Time Bonus.<br>
+                        Wrong: -25pts.<br>
+                        Hint/Skip: -50pts.
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Config ---
+        // --- 5 Levels Configuration ---
         const LEVELS = {
             1: { digits: 2, distinct: 4, time: 90 },
-            2: { digits: 3, distinct: 6, time: 180 },
-            3: { digits: 4, distinct: 8, time: 360 }
+            2: { digits: 3, distinct: 6, time: 120 },
+            3: { digits: 4, distinct: 8, time: 180 },
+            4: { digits: 5, distinct: 9, time: 240 },
+            5: { digits: 6, distinct: 10, time: 300 }
         };
 
         // --- Game State ---
         const gameState = {
             score: 0,
             stats: { 
-                highScore: 0, 
-                highScoreDate: '-', 
-                maxLevel: 1, 
-                longestSession: 0 // in seconds
+                highScore: 0, highScoreDate: '-', 
+                maxLevel: 1, longestSession: 0,
+                historyScores: [] // Array of {score: int, date: str}
             },
-            historyData: [], 
             level: 1,
-            timeLeft: 0,
-            maxTime: 60,
-            timerInterval: null,
-            puzzle: null,
-            letterMap: {}, reverseMap: {}, guessedLetters: {}, selectedChar: null,
+            timeLeft: 0, maxTime: 60, timerInterval: null,
+            puzzle: null, letterMap: {}, reverseMap: {}, guessedLetters: {}, selectedChar: null,
             sessionHistory: [0],
             isPaused: true, isTransitioning: false,
             sessionStartTime: Date.now()
@@ -284,6 +338,7 @@
             timerPath: document.getElementById('timerPath'),
             msg: document.getElementById('messageArea'),
             sessionChart: document.getElementById('sessionChart'),
+            historyChart: document.getElementById('historyChart'),
             toast: document.getElementById('toast'),
             statMaxLvl: document.getElementById('statMaxLvl'),
             statLongestTime: document.getElementById('statLongestTime'),
@@ -302,34 +357,35 @@
             document.getElementById('hintBtn').onclick = useHint;
             document.getElementById('skipBtn').onclick = skipLevel;
             
-            // Periodically update session length
             setInterval(updateSessionTime, 30000); 
         }
 
         // --- Data & Stats ---
         function loadData() {
-            const saved = localStorage.getItem('sumPuzzle_stats_v6');
+            const saved = localStorage.getItem('sumPuzzle_stats_v8');
             if (saved) {
-                gameState.stats = JSON.parse(saved);
+                const data = JSON.parse(saved);
+                gameState.stats = { ...gameState.stats, ...data }; // Merge default with saved
             }
             updateStatsUI();
         }
 
         function saveData() {
-            localStorage.setItem('sumPuzzle_stats_v6', JSON.stringify(gameState.stats));
+            localStorage.setItem('sumPuzzle_stats_v8', JSON.stringify(gameState.stats));
         }
 
         function updateStats(newScore) {
-            // High Score
+            // High Score Logic
             if (newScore > gameState.stats.highScore) {
                 const now = new Date();
                 gameState.stats.highScore = newScore;
                 gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
+                
+                // Add to history if it's a new high score or significantly high (simple logic: just push current score if it's a PB)
+                gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate });
+                if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
             }
-            // Max Level (Check current)
-            if (gameState.level > gameState.stats.maxLevel) {
-                gameState.stats.maxLevel = gameState.level;
-            }
+            if (gameState.level > gameState.stats.maxLevel) gameState.stats.maxLevel = gameState.level;
             saveData();
             updateStatsUI();
         }
@@ -346,7 +402,6 @@
         function updateStatsUI() {
             el.highScore.innerText = `Best: ${gameState.stats.highScore}`;
             el.statMaxLvl.innerText = gameState.stats.maxLevel;
-            
             const mins = Math.floor(gameState.stats.longestSession / 60);
             el.statLongestTime.innerText = mins + "m";
         }
@@ -355,9 +410,9 @@
         function startLevel() {
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
-            updateStats(gameState.score); // Check level/score stats
+            updateStats(gameState.score); 
 
-            const config = LEVELS[gameState.level] || LEVELS[3];
+            const config = LEVELS[gameState.level] || LEVELS[5];
             gameState.maxTime = config.time;
             gameState.timeLeft = config.time;
             gameState.guessedLetters = {};
@@ -373,7 +428,9 @@
         }
 
         function generatePuzzle(config, attempts = 0) {
+            // Adjust distinct requirement if too hard
             if(attempts > 50) config.distinct = Math.max(3, config.distinct - 1);
+            
             const min = Math.pow(10, config.digits - 1);
             const max = Math.pow(10, config.digits) - 1;
             let n1 = Math.floor(Math.random() * (max - min) + min);
@@ -401,6 +458,10 @@
 
         function renderBoard() {
             el.grid.innerHTML = '';
+            // Adjust font size based on digits
+            const digits = LEVELS[gameState.level] ? LEVELS[gameState.level].digits : 2;
+            el.grid.style.fontSize = digits > 4 ? '1.5rem' : '2.2rem';
+
             const createRow = (arr, rowId) => {
                 const r = document.createElement('div'); r.className='number-row'; r.style.gridRow=rowId; 
                 arr.forEach(c => {
@@ -457,8 +518,8 @@
             if (needed.every(c => gameState.guessedLetters[c])) {
                 clearInterval(gameState.timerInterval);
                 gameState.isTransitioning = true;
-                updateStats(gameState.score); // Update stats on win
-                if (gameState.level < 3) gameState.level++;
+                updateStats(gameState.score);
+                if (gameState.level < 5) gameState.level++; // Cap at 5
                 el.msg.innerText = "Level Complete!"; el.msg.style.color = "var(--correct)";
                 setTimeout(startLevel, 2000);
             }
@@ -510,92 +571,88 @@
         }
         function showToast(text) { el.toast.innerText = text; el.toast.classList.add('show'); setTimeout(() => el.toast.classList.remove('show'), 2000); }
 
-        // --- PHP / Leaderboard Integration ---
-        
-        const API_URL = 'score_api.php'; // Ensure this file exists on your server
-
-        function openSubmitModal() {
-            el.modals.submit.style.display = 'flex';
-        }
+        // --- PHP / Leaderboard ---
+        const API_URL = 'score_api.php'; 
+        function openSubmitModal() { el.modals.submit.style.display = 'flex'; }
 
         function submitScoreToPHP() {
             const name = document.getElementById('playerName').value.trim();
             if(!name) { alert("Please enter a name"); return; }
             
             const payload = new URLSearchParams();
-            payload.append('action', 'submit');
-            payload.append('name', name);
-            payload.append('score', gameState.score);
-            payload.append('level', gameState.stats.maxLevel);
+            payload.append('action', 'submit'); payload.append('name', name);
+            payload.append('score', gameState.score); payload.append('level', gameState.stats.maxLevel);
 
-            fetch(API_URL, { method: 'POST', body: payload })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    el.modals.submit.style.display = 'none';
-                    showToast("Score Submitted!");
-                    openMenu('leaderboard'); // Switch to leaderboard tab
-                } else {
-                    alert("Error: " + data.message);
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Failed to connect to server.");
-            });
+            fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
+                if(data.status === 'success') { el.modals.submit.style.display = 'none'; showToast("Score Submitted!"); openMenu('leaderboard'); } 
+                else { alert("Error: " + data.message); }
+            }).catch(err => { console.error(err); alert("Failed to connect to server."); });
         }
 
         function fetchLeaderboard() {
-            const lbDiv = document.getElementById('lbTable');
-            document.getElementById('lbLoading').style.display = 'block';
-            lbDiv.innerHTML = '';
-
-            fetch(API_URL + '?action=get')
-            .then(res => res.json())
-            .then(data => {
+            const lbDiv = document.getElementById('lbTable'); document.getElementById('lbLoading').style.display = 'block'; lbDiv.innerHTML = '';
+            fetch(API_URL + '?action=get').then(res => res.json()).then(data => {
                 document.getElementById('lbLoading').style.display = 'none';
                 let html = '<tr><th>#</th><th>Name</th><th>Lvl</th><th style="text-align:right">Score</th></tr>';
                 data.forEach((row, index) => {
                     let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : (index + 1)));
-                    html += `<tr>
-                        <td class="lb-rank">${rankIcon}</td>
-                        <td>${row.name}</td>
-                        <td>${row.level}</td>
-                        <td class="lb-score">${row.score}</td>
-                    </tr>`;
+                    html += `<tr><td class="lb-rank">${rankIcon}</td><td>${row.name}</td><td>${row.level}</td><td class="lb-score">${row.score}</td></tr>`;
                 });
                 lbDiv.innerHTML = html;
-            })
-            .catch(err => {
-                document.getElementById('lbLoading').innerText = "Failed to load scores.";
-            });
+            }).catch(err => { document.getElementById('lbLoading').innerText = "Failed to load scores."; });
         }
 
-        // --- Utils ---
+        // --- Utils & Chart Toggling ---
+        function togglePerfChart(type) {
+            document.getElementById('subTabSession').classList.remove('active');
+            document.getElementById('subTabHistory').classList.remove('active');
+            document.getElementById('sessionChart').style.display = 'none';
+            document.getElementById('historyChart').style.display = 'none';
+
+            if(type === 'session') {
+                document.getElementById('subTabSession').classList.add('active');
+                document.getElementById('sessionChart').style.display = 'block';
+                drawChart(el.sessionChart, gameState.sessionHistory, '#6C5CE7');
+            } else {
+                document.getElementById('subTabHistory').classList.add('active');
+                document.getElementById('historyChart').style.display = 'block';
+                // Extract just scores for the chart
+                const historyVals = gameState.stats.historyScores.map(x => x.score);
+                drawChart(el.historyChart, historyVals, '#00CEC9');
+            }
+        }
+
         function setupNumpad() { for(let i=0; i<=9; i++) { const b=document.createElement('button'); b.className='num-btn'; b.innerText=i; b.onclick=()=>handleInput(i,b); el.numpad.appendChild(b); } }
         function setupKeyboard() { document.addEventListener('keydown', e => { if(e.key>='0'&&e.key<='9') { const b=[...document.querySelectorAll('.num-btn')].find(x=>x.innerText===e.key); handleInput(parseInt(e.key),b); } }); }
         function closeIntro() { if(document.getElementById('dontShowAgain').checked) localStorage.setItem('sumPuzzle_skipIntro', 'true'); el.modals.intro.style.display='none'; gameState.isPaused=false; startLevel(); }
-        function openMenu(tab) { gameState.isPaused=true; updateSessionTime(); el.modals.menu.style.display='flex'; switchTab(tab); }
+        
+        function openMenu(tab) { 
+            gameState.isPaused=true; updateSessionTime(); el.modals.menu.style.display='flex'; switchTab(tab); 
+            // Default to Session chart when opening
+            if(tab === 'status') togglePerfChart('session');
+        }
         function resumeGame() { el.modals.menu.style.display='none'; gameState.isPaused=false; }
         
         function switchTab(t) {
             document.querySelectorAll('.tab, .tab-content').forEach(x=>x.classList.remove('active'));
             document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active');
             document.getElementById(t).classList.add('active');
-            if(t==='status') setTimeout(drawChart, 100);
             if(t==='leaderboard') fetchLeaderboard();
         }
         function setupTabs() { document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>switchTab(t.dataset.tab))); }
-        function drawChart() {
-            const c=el.sessionChart, ctx=c.getContext('2d'), data=gameState.sessionHistory;
-            c.width=c.clientWidth; c.height=c.clientHeight; ctx.clearRect(0,0,c.width,c.height);
-            if(data.length<1) return;
+        
+        function drawChart(c, data, color) {
+            const ctx=c.getContext('2d'); c.width=c.clientWidth; c.height=c.clientHeight; ctx.clearRect(0,0,c.width,c.height);
+            if(data.length<1) {
+                ctx.fillStyle="#b2bec3"; ctx.font="12px sans-serif"; ctx.textAlign="center"; 
+                ctx.fillText("No data yet", c.width/2, c.height/2); return;
+            }
             const max=Math.max(...data,100), step=c.width/Math.max(data.length-1,1);
             ctx.beginPath();
             data.forEach((p,i) => { const x=i*step, y=c.height-((p/max)*(c.height*0.7))-10; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
-            ctx.strokeStyle='#6C5CE7'; ctx.lineWidth=3; ctx.stroke();
+            ctx.strokeStyle=color; ctx.lineWidth=3; ctx.stroke();
             ctx.lineTo(c.width,c.height); ctx.lineTo(0,c.height);
-            const g=ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0,'rgba(108,92,231,0.2)'); g.addColorStop(1,'white');
+            const g=ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0, color.replace(')', ', 0.2)').replace('#', 'rgba(')); g.addColorStop(1,'white');
             ctx.fillStyle=g; ctx.fill();
         }
 
