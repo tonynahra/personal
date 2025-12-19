@@ -92,9 +92,10 @@
             max-height: 90vh; overflow-y: auto;
         }
 
-        /* Fixed Menu Modal */
+        /* Fixed Menu Modal - COMPACT SIZING */
         .modal.menu-modal {
-            height: 680px; max-height: 95vh;
+            height: 620px; /* Reduced Height */
+            max-height: 95vh;
             display: flex; flex-direction: column; padding: 0; 
         }
 
@@ -102,57 +103,53 @@
         .menu-body { padding: 0 1rem 1rem 1rem; flex: 1; overflow-y: auto; }
 
         .tabs { display: flex; border-bottom: 2px solid var(--light); margin-bottom: 0.5rem; }
-        .tab { padding: 10px 15px; cursor: pointer; font-weight: bold; color: #b2bec3; border-bottom: 3px solid transparent; }
+        .tab { padding: 8px 15px; cursor: pointer; font-weight: bold; font-size: 0.9rem; color: #b2bec3; border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .stat-card { background: var(--bg); padding: 10px 5px; border-radius: 8px; text-align: center; }
-        .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: var(--primary); }
-        .stat-lbl { font-size: 0.65rem; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .stat-card { background: var(--bg); padding: 8px 4px; border-radius: 8px; text-align: center; }
+        .stat-val { display: block; font-weight: bold; font-size: 1rem; color: var(--primary); }
+        .stat-lbl { font-size: 0.6rem; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* Tables */
-        .rules-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 15px; }
-        .rules-table th { background: #f0f3f5; color: #636e72; padding: 6px 8px; text-align: left; font-size: 0.8rem; }
-        .rules-table td { padding: 6px 8px; border-bottom: 1px solid #dfe6e9; color: var(--dark); }
+        .rules-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; }
+        .rules-table th { background: #f0f3f5; color: #636e72; padding: 5px 8px; text-align: left; font-size: 0.75rem; }
+        .rules-table td { padding: 5px 8px; border-bottom: 1px solid #dfe6e9; color: var(--dark); }
         .rules-table tr:last-child td { border-bottom: none; }
-        .tag { padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; color: white; display: inline-block; }
+        .tag { padding: 2px 6px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; color: white; display: inline-block; }
 
-        .lb-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .lb-table th { text-align: left; color: #b2bec3; padding-bottom: 5px; font-size: 0.8rem; }
-        .lb-table td { padding: 6px 0; border-bottom: 1px solid var(--light); }
-        .lb-rank { font-weight: bold; color: var(--primary); width: 30px; }
+        .lb-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .lb-table th { text-align: left; color: #b2bec3; padding-bottom: 5px; font-size: 0.75rem; }
+        .lb-table td { padding: 5px 0; border-bottom: 1px solid var(--light); }
+        .lb-rank { font-weight: bold; color: var(--primary); width: 25px; }
         .lb-score { font-weight: bold; text-align: right; }
 
-        /* Scoring */
-        .scoring-box { background: var(--bg); border-radius: 10px; padding: 10px 15px; margin-top: 5px; }
-        .score-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 3px; }
-        .score-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-        .plus { color: var(--correct); font-weight: bold; }
-        .minus { color: var(--wrong); font-weight: bold; }
-
-        /* Chart, Table & No Data Message - INCREASED HEIGHT TO 220px */
-        canvas { 
-            width: 100%; height: 220px; 
-            background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px; 
-        }
-        .no-data {
-            width: 100%; height: 220px; 
-            background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
-            display: flex; justify-content: center; align-items: center; color: #b2bec3; font-weight: bold; font-size: 0.9rem;
-        }
+        /* History Table Styling - COMPACT */
         .history-table-container {
-            height: 220px; 
-            overflow-y: auto; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 10px;
+            height: 160px; /* Reduced Height to fit without scroll */
+            overflow-y: auto; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 8px;
         }
-        /* End Height Increase */
-
         .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .history-table th { position: sticky; top: 0; background: #dfe6e9; color: #636e72; padding: 5px 10px; text-align: left; font-size: 0.75rem; z-index: 2; }
         .history-table td { padding: 6px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); color: var(--dark); }
         .history-table tr:nth-child(even) { background-color: rgba(255,255,255,0.5); }
+
+        /* Scoring */
+        .scoring-box { background: var(--bg); border-radius: 10px; padding: 8px 12px; margin-top: 5px; }
+        .score-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 2px; }
+        .score-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .plus { color: var(--correct); font-weight: bold; }
+        .minus { color: var(--wrong); font-weight: bold; }
+
+        /* Chart & No Data Message */
+        canvas { width: 100%; height: 160px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 8px; }
+        .no-data {
+            width: 100%; height: 160px; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 8px;
+            display: flex; justify-content: center; align-items: center; color: #b2bec3; font-weight: bold; font-size: 0.85rem;
+        }
 
         .toast {
             position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
@@ -161,11 +158,18 @@
         }
         .toast.show { opacity: 1; }
         
-        .sub-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 10px; background: var(--bg); padding: 5px; border-radius: 8px; }
-        .sub-tab { padding: 5px 10px; cursor: pointer; font-size: 0.8rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; flex: 1; text-align: center; }
+        .sub-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 8px; background: var(--bg); padding: 4px; border-radius: 8px; }
+        .sub-tab { padding: 4px 10px; cursor: pointer; font-size: 0.75rem; border-radius: 5px; color: #636e72; font-weight: bold; border: 1px solid transparent; flex: 1; text-align: center; }
         .sub-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .intro-actions { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        
+        /* Compact Buttons */
+        .menu-btn-group { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
+        .menu-btn { width:100%; padding: 10px 0; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; font-size: 0.95rem; }
+        .btn-resume { background: var(--primary); color: white; }
+        .btn-share { background: var(--light); color: var(--dark); }
+        .btn-lb { background: var(--correct); color: white; }
 
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
@@ -252,7 +256,7 @@
 
             <div class="menu-body">
                 <div id="status" class="tab-content active">
-                    <h3 style="text-align: center; margin-top:0;">Your Performance</h3>
+                    <h3 style="text-align: center; margin-top:0; font-size:1rem;">Your Performance</h3>
                     <div class="stats-grid">
                         <div class="stat-card"><span class="stat-val" id="statMaxLvl">1</span><span class="stat-lbl">Max Level</span></div>
                         <div class="stat-card"><span class="stat-val" id="statLongestTime">0m</span><span class="stat-lbl">Longest Session</span></div>
@@ -275,9 +279,11 @@
                         <div id="msgTable" class="no-data" style="display:none; height:100%;">No data yet.</div>
                     </div>
 
-                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--primary); color:white; border:none;" onclick="shareScore()">📤 Share to Socials</button>
-                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--correct); color:white; border:none;" onclick="openSubmitModal()">🌍 Global Leaderboard</button>
-                    <button class="num-btn" style="width:100%; margin-top:10px; background:var(--light); color:var(--dark); border:none;" onclick="resumeGame()">Resume Game</button>
+                    <div class="menu-btn-group">
+                        <button class="menu-btn btn-resume" onclick="resumeGame()">Resume Game</button>
+                        <button class="menu-btn btn-share" onclick="shareScore()">📤 Share to Socials</button>
+                        <button class="menu-btn btn-lb" onclick="openSubmitModal()">🌍 Global Leaderboard</button>
+                    </div>
                 </div>
 
                 <div id="leaderboard" class="tab-content">
@@ -522,15 +528,32 @@
         function updateUI() { el.score.innerText = gameState.score; }
         function loadData() { const saved = localStorage.getItem('sumPuzzle_stats_v11'); if (saved) gameState.stats = { ...gameState.stats, ...JSON.parse(saved) }; updateStatsUI(); }
         function saveData() { localStorage.setItem('sumPuzzle_stats_v11', JSON.stringify(gameState.stats)); }
+        
         function updateStats(newScore) {
+            const now = new Date();
+            const dateStr = (now.getMonth()+1) + '/' + now.getDate();
+
             if (newScore > gameState.stats.highScore) {
-                const now = new Date(); gameState.stats.highScore = newScore; gameState.stats.highScoreDate = (now.getMonth()+1) + '/' + now.getDate();
-                gameState.stats.historyScores.push({ score: newScore, date: gameState.stats.highScoreDate, level: gameState.level });
-                if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
+                gameState.stats.highScore = newScore; 
+                gameState.stats.highScoreDate = dateStr;
             }
+
+            // Consolidate History by Date
+            const existingIndex = gameState.stats.historyScores.findIndex(x => x.date === dateStr);
+            if (existingIndex !== -1) {
+                // Update existing entry for today
+                gameState.stats.historyScores[existingIndex] = { score: newScore, date: dateStr, level: gameState.level };
+            } else {
+                // Add new entry
+                gameState.stats.historyScores.push({ score: newScore, date: dateStr, level: gameState.level });
+            }
+
+            if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
+
             if (gameState.level > gameState.stats.maxLevel) gameState.stats.maxLevel = gameState.level;
             saveData(); updateStatsUI();
         }
+
         function updateSessionTime() { const sec = (Date.now() - gameState.sessionStartTime) / 1000; if (sec > gameState.stats.longestSession) { gameState.stats.longestSession = sec; saveData(); updateStatsUI(); } }
         function updateStatsUI() { 
             el.highScore.innerText = `Best: ${gameState.stats.highScore}`; 
@@ -587,7 +610,6 @@
             document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active'); 
             document.getElementById(t).classList.add('active'); 
             if(t==='leaderboard') fetchLeaderboard();
-            // FIX: If switching to status from within menu, trigger check
             if(t==='status') togglePerfChart('session');
         }
         
@@ -601,7 +623,6 @@
             
             if(type==='session') { 
                 document.getElementById('subTabSession').classList.add('active');
-                // LOGIC FIX: Check if sessionHistory is empty or only contains initial [0]
                 if(gameState.sessionHistory.length <= 1 && gameState.sessionHistory[0] === 0) { 
                     document.getElementById('msgSession').style.display='flex'; 
                 } else { 
@@ -622,7 +643,7 @@
         function renderHistoryTable() {
             const table = document.getElementById('historyTable');
             const data = [...gameState.stats.historyScores].reverse();
-            let html = `<thead><tr><th>Date</th><th>Lvl</th><th>Score</th></tr></thead><tbody>`;
+            let html = `<thead><tr><th>Date</th><th>Level</th><th>Score</th></tr></thead><tbody>`;
             data.forEach(row => { html += `<tr><td>${row.date}</td><td>${row.level || '-'}</td><td>${row.score}</td></tr>`; });
             html += `</tbody>`;
             table.innerHTML = html;
