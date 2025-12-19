@@ -94,7 +94,7 @@
 
         /* Fixed Menu Modal - COMPACT SIZING */
         .modal.menu-modal {
-            height: 620px; /* Reduced Height */
+            height: 600px; 
             max-height: 95vh;
             display: flex; flex-direction: column; padding: 0; 
         }
@@ -127,10 +127,9 @@
         .lb-rank { font-weight: bold; color: var(--primary); width: 25px; }
         .lb-score { font-weight: bold; text-align: right; }
 
-        /* History Table Styling - COMPACT */
+        /* History Table Styling */
         .history-table-container {
-            height: 160px; /* Reduced Height to fit without scroll */
-            overflow-y: auto; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 8px;
+            height: 160px; overflow-y: auto; background: var(--bg); border-radius: 8px; margin-top: 5px; margin-bottom: 8px;
         }
         .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .history-table th { position: sticky; top: 0; background: #dfe6e9; color: #636e72; padding: 5px 10px; text-align: left; font-size: 0.75rem; z-index: 2; }
@@ -381,7 +380,7 @@
         };
 
         function init() {
-            setupNumpad(); setupTabs(); setupKeyboard(); loadData();
+            setupNumpad(); setupTabs(); setupKeyboard(); loadData(); cleanHistoryData();
             fetch('daily.php').then(res => res.json()).then(data => {
                 gameState.dailySeedBase = data.seed; dailyGameId = data.gameId; 
                 el.modals.intro.style.display = 'flex';
@@ -415,7 +414,7 @@
             clearInterval(gameState.timerInterval);
             gameState.isTransitioning = false;
             
-            const todayStr = new Date().toDateString();
+            const todayStr = getFormattedDate();
             if(gameState.stats.lastPlayedDate !== todayStr) {
                 gameState.stats.totalDays++;
                 gameState.stats.lastPlayedDate = todayStr;
@@ -529,26 +528,64 @@
         function loadData() { const saved = localStorage.getItem('sumPuzzle_stats_v11'); if (saved) gameState.stats = { ...gameState.stats, ...JSON.parse(saved) }; updateStatsUI(); }
         function saveData() { localStorage.setItem('sumPuzzle_stats_v11', JSON.stringify(gameState.stats)); }
         
-        function updateStats(newScore) {
+        function getFormattedDate() {
             const now = new Date();
-            const dateStr = (now.getMonth()+1) + '/' + now.getDate();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            return `${mm}/${dd}/${yyyy}`;
+        }
+
+        function cleanHistoryData() {
+            // Fix messy data (e.g. 12/18 -> 12/18/2025) and dedupe
+            const unique = {};
+            const curYear = new Date().getFullYear();
+            
+            gameState.stats.historyScores.forEach(entry => {
+                let date = entry.date;
+                // Fix Short Dates
+                if (date.length <= 5) date += "/" + curYear;
+                
+                // Consolidate: Keep last recorded score for that date
+                // Note: Since we are iterating an array, later entries overwrite earlier ones
+                // ensuring "Last of the Day" logic.
+                unique[date] = { 
+                    score: entry.score, 
+                    level: entry.level || 1, 
+                    date: date 
+                };
+            });
+            gameState.stats.historyScores = Object.values(unique);
+            saveData();
+        }
+
+        function updateStats(newScore) {
+            const dateStr = getFormattedDate();
 
             if (newScore > gameState.stats.highScore) {
                 gameState.stats.highScore = newScore; 
                 gameState.stats.highScoreDate = dateStr;
             }
 
-            // Consolidate History by Date
+            // Consolidate: Find entry for today and OVERWRITE it
             const existingIndex = gameState.stats.historyScores.findIndex(x => x.date === dateStr);
+            
             if (existingIndex !== -1) {
-                // Update existing entry for today
-                gameState.stats.historyScores[existingIndex] = { score: newScore, date: dateStr, level: gameState.level };
+                // Always overwrite with current score (Latest of the day)
+                gameState.stats.historyScores[existingIndex] = { 
+                    score: newScore, 
+                    date: dateStr, 
+                    level: gameState.level 
+                };
             } else {
-                // Add new entry
-                gameState.stats.historyScores.push({ score: newScore, date: dateStr, level: gameState.level });
+                gameState.stats.historyScores.push({ 
+                    score: newScore, 
+                    date: dateStr, 
+                    level: gameState.level 
+                });
             }
 
-            if(gameState.stats.historyScores.length > 20) gameState.stats.historyScores.shift();
+            if(gameState.stats.historyScores.length > 30) gameState.stats.historyScores.shift();
 
             if (gameState.level > gameState.stats.maxLevel) gameState.stats.maxLevel = gameState.level;
             saveData(); updateStatsUI();
@@ -579,7 +616,7 @@
             const lbDiv = document.getElementById('lbTable'); document.getElementById('lbLoading').style.display = 'block'; lbDiv.innerHTML = '';
             fetch(API_URL + '?action=get').then(res=>res.json()).then(data=>{
                 document.getElementById('lbLoading').style.display = 'none';
-                let html = '<tr><th>#</th><th>Name</th><th>Lvl</th><th style="text-align:right">Score</th></tr>';
+                let html = '<tr><th>#</th><th>Name</th><th>Level</th><th style="text-align:right">Score</th></tr>';
                 data.forEach((row,i) => { let icon = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':i+1)); html += `<tr><td class="lb-rank">${icon}</td><td>${row.name}</td><td>${row.level}</td><td class="lb-score">${row.score}</td></tr>`; });
                 lbDiv.innerHTML = html;
             });
@@ -593,8 +630,6 @@
             updateSessionTime(); 
             el.modals.menu.style.display='flex'; 
             switchTab(tab); 
-            
-            // FIX: If opening Status, run toggle logic immediately to handle empty state
             if(tab === 'status') {
                 togglePerfChart('session');
             }
